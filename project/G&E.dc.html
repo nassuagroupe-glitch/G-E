@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/broadsheet-ea66bc29-5b00-4ee8-8d39-c462b5044375/styles.css">
+<script src="_ds/broadsheet-ea66bc29-5b00-4ee8-8d39-c462b5044375/_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--color-bg); }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: var(--color-neutral-300); }
+  a { color: var(--color-accent-700); text-decoration: none; }
+  a:hover { color: var(--color-accent-2-700); }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); font-size: 15px;">
+
+  <div style="display: flex; align-items: baseline; gap: 30px; padding: 18px 40px 14px; border-bottom: 3px solid var(--color-text);">
+    <div style="display: flex; align-items: baseline; gap: 10px;">
+      <span style="font-family: var(--font-heading); font-weight: 700; font-size: 30px; letter-spacing: -0.02em;">G&amp;E</span>
+      <span style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-neutral-600);">Pièces &amp; consommables auto</span>
+    </div>
+    <div style="flex: 1;"></div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span style="font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--color-neutral-600);">Dépôt</span>
+      <select class="input" style="font-family: var(--font-body); font-size: 14px; padding: 4px 8px; min-width: 190px;" value="{{ depotId }}" onChange="{{ onDepot }}">
+        <sc-for list="{{ depots }}" as="d" hint-placeholder-count="5">
+          <option value="{{ d.id }}">{{ d.label }}</option>
+        </sc-for>
+      </select>
+    </div>
+    <div style="display: flex; gap: 0;">
+      <button class="btn btn-ghost" style="font-size: 13px; padding: 5px 12px;" onClick="{{ onDesktop }}" style-hover="background: var(--color-accent-100);">Bureau</button>
+      <button class="btn btn-ghost" style="font-size: 13px; padding: 5px 12px;" onClick="{{ onMobile }}" style-hover="background: var(--color-accent-100);">Mobile</button>
+    </div>
+    <div style="text-align: right; line-height: 1.25;">
+      <div style="font-weight: 600;">K. Assamoi</div>
+      <div style="font-size: 12px; color: var(--color-neutral-600);">Direction · tous dépôts</div>
+    </div>
+  </div>
+
+  <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+  <div style="display: grid; grid-template-columns: 220px 1fr;">
+
+    <nav style="padding: 26px 0 60px 40px; display: flex; flex-direction: column; gap: 2px; align-self: start; position: sticky; top: 0;">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="8">
+        <button onClick="{{ n.go }}" style="{{ n.style }}" style-hover="color: var(--color-accent-700);">{{ n.label }}</button>
+      </sc-for>
+      <div style="margin-top: 26px; font-size: 12px; line-height: 1.6; color: var(--color-neutral-600);">
+        Firebase · synchro<br><span style="color: var(--color-accent-700);">{{ syncLabel }}</span>
+      </div>
+    </nav>
+
+    <main style="padding: 26px 48px 80px 34px; max-width: 1180px;">
+
+      <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
+        <h1 style="font-size: 40px; margin: 0 0 4px; letter-spacing: -0.02em;">Tableau de bord</h1>
+        <p style="margin: 0 0 34px; color: var(--color-neutral-600); font-size: 15px;">{{ today }} · {{ depotName }}</p>
+
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 34px; margin-bottom: 48px;">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+            <div>
+              <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 8px;">{{ k.label }}</div>
+              <div style="font-family: var(--font-heading); font-size: 34px; font-weight: 600; letter-spacing: -0.02em; line-height: 1;">{{ k.value }}</div>
+              <div style="font-size: 13px; color: var(--color-neutral-600); margin-top: 6px;">{{ k.note }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.35fr 1fr; gap: 56px;">
+          <div>
+            <h2 style="font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin: 0 0 14px; color: var(--color-neutral-700);">Ventes par dépôt — 30 jours</h2>
+            <sc-for list="{{ depotStats }}" as="d" hint-placeholder-count="5">
+              <div style="display: grid; grid-template-columns: 150px 1fr 110px; align-items: center; gap: 14px; padding: 9px 0; border-bottom: 1px solid var(--color-divider);">
+                <span style="font-weight: 600;">{{ d.name }}</span>
+                <span style="height: 9px; background: var(--color-neutral-200); display: block;"><span style="display: block; height: 9px; background: var(--color-accent); width: {{ d.pct }};"></span></span>
+                <span style="text-align: right; font-variant-numeric: tabular-nums;">{{ d.ca }}</span>
+              </div>
+            </sc-for>
+          </div>
+          <div>
+            <h2 style="font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin: 0 0 14px; color: var(--color-neutral-700);">Alertes de réapprovisionnement</h2>
+            <sc-for list="{{ alerts }}" as="a" hint-placeholder-count="5">
+              <div style="padding: 9px 0; border-bottom: 1px solid var(--color-divider);">
+                <div style="display: flex; justify-content: space-between; gap: 12px;">
+                  <span style="font-weight: 600;">{{ a.nom }}</span>
+                  <span class="tag tag-accent-2" style="font-size: 11px;">{{ a.qte }}</span>
+                </div>
+                <div style="font-size: 13px; color: var(--color-neutral-600);">{{ a.ref }} · seuil {{ a.seuil }} · {{ a.depot }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isCat }}" hint-placeholder-val="{{ true }}">
+        <h1 style="font-size: 40px; margin: 0 0 4px; letter-spacing: -0.02em;">Catalogue</h1>
+        <p style="margin: 0 0 26px; color: var(--color-neutral-600);">{{ catCount }} références · {{ depotName }}</p>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 8px;">
+          <div style="flex: 1; min-width: 260px;">
+            <label style="display: block; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 5px;">Recherche libre, réf. OEM ou code-barres</label>
+            <input class="input" style="width: 100%; font-family: var(--font-body); font-size: 15px;" placeholder="ex. 45022-SNA · plaquettes · 6001234500123" value="{{ q }}" onChange="{{ onQ }}">
+          </div>
+          <div>
+            <label style="display: block; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 5px;">Marque</label>
+            <select class="input" style="font-family: var(--font-body); font-size: 15px; min-width: 150px;" value="{{ marque }}" onChange="{{ onMarque }}">
+              <sc-for list="{{ marques }}" as="m" hint-placeholder-count="6"><option value="{{ m }}">{{ m }}</option></sc-for>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 5px;">Catégorie</label>
+            <select class="input" style="font-family: var(--font-body); font-size: 15px; min-width: 160px;" value="{{ cat }}" onChange="{{ onCat }}">
+              <sc-for list="{{ cats }}" as="c" hint-placeholder-count="6"><option value="{{ c }}">{{ c }}</option></sc-for>
+            </select>
+          </div>
+          <button class="btn btn-secondary" style="font-size: 14px;" onClick="{{ onScan }}">Scanner</button>
+        </div>
+        <div style="font-size: 13px; color: var(--color-neutral-600); margin-bottom: 18px;">{{ scanHint }}</div>
+
+        <table class="table" style="width: 100%; font-size: 14px;">
+          <thead><tr>
+            <th style="text-align: left;">Référence</th>
+            <th style="text-align: left;">Désignation</th>
+            <th style="text-align: left;">Compatibilité</th>
+            <th style="text-align: right;">Stock total</th>
+            <th style="text-align: right;">P.V. HT</th>
+            <th></th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ parts }}" as="p" hint-placeholder-count="8">
+              <tr>
+                <td style="font-variant-numeric: tabular-nums;">{{ p.ref }}<div style="font-size: 12px; color: var(--color-neutral-600);">OEM {{ p.oem }}</div></td>
+                <td style="font-weight: 600;">{{ p.nom }}<div style="font-size: 12px; font-weight: 400; color: var(--color-neutral-600);">{{ p.cat }}</div></td>
+                <td style="font-size: 13px;">{{ p.compat }}</td>
+                <td style="text-align: right; font-variant-numeric: tabular-nums;">{{ p.total }}<div style="font-size: 12px; color: var(--color-neutral-600);">{{ p.repartition }}</div></td>
+                <td style="text-align: right; font-variant-numeric: tabular-nums;">{{ p.pv }}</td>
+                <td style="text-align: right;"><button class="btn btn-ghost" style="font-size: 13px; padding: 3px 10px;" onClick="{{ p.addToCart }}">Vendre</button></td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </sc-if>
+
+      <sc-if value="{{ isPos }}" hint-placeholder-val="{{ true }}">
+        <h1 style="font-size: 40px; margin: 0 0 4px; letter-spacing: -0.02em;">Vente comptoir</h1>
+        <p style="margin: 0 0 26px; color: var(--color-neutral-600);">Ticket {{ ticketNo }} · {{ depotName }} · caissier M. Koné</p>
+
+        <div style="display: grid; grid-template-columns: 1.3fr 1fr; gap: 48px; align-items: start;">
+          <div>
+            <input class="input" style="width: 100%; font-family: var(--font-body); font-size: 16px; margin-bottom: 16px;" placeholder="Scanner ou saisir une référence…" value="{{ q }}" onChange="{{ onQ }}">
+            <sc-for list="{{ parts }}" as="p" hint-placeholder-count="6">
+              <button onClick="{{ p.addToCart }}" style="display: grid; grid-template-columns: 1fr auto; gap: 10px; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--color-divider); padding: 11px 2px; font-family: var(--font-body); font-size: 15px; color: var(--color-text); cursor: pointer;" style-hover="background: var(--color-accent-100);">
+                <span>
+                  <span style="font-weight: 600;">{{ p.nom }}</span>
+                  <span style="display: block; font-size: 12px; color: var(--color-neutral-600);">{{ p.ref }} · {{ p.dispo }} en rayon</span>
+                </span>
+                <span style="font-variant-numeric: tabular-nums; align-self: center;">{{ p.pv }}</span>
+              </button>
+            </sc-for>
+          </div>
+
+          <div>
+            <h2 style="font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin: 0 0 12px; color: var(--color-neutral-700);">Ticket en cours</h2>
+            <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
+              <p style="color: var(--color-neutral-600); font-style: italic; margin: 0 0 20px;">Aucun article. Scannez une pièce ou choisissez-la à gauche.</p>
+            </sc-if>
+            <sc-for list="{{ cart }}" as="l" hint-placeholder-count="0">
+              <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--color-divider);">
+                <span>
+                  <span style="font-weight: 600;">{{ l.nom }}</span>
+                  <span style="display: block; font-size: 12px; color: var(--color-neutral-600);">{{ l.ref }} · {{ l.pu }}</span>
+                </span>
+                <span style="display: flex; align-items: center; gap: 6px;">
+                  <button class="btn btn-ghost" style="padding: 0 8px; font-size: 15px;" onClick="{{ l.dec }}">−</button>
+                  <span style="min-width: 20px; text-align: center; font-variant-numeric: tabular-nums;">{{ l.qte }}</span>
+                  <button class="btn btn-ghost" style="padding: 0 8px; font-size: 15px;" onClick="{{ l.inc }}">+</button>
+                </span>
+                <span style="min-width: 92px; text-align: right; font-variant-numeric: tabular-nums;">{{ l.total }}</span>
+              </div>
+            </sc-for>
+
+            <div style="margin-top: 18px; display: grid; grid-template-columns: 1fr auto; gap: 6px 10px; font-variant-numeric: tabular-nums;">
+              <span style="color: var(--color-neutral-700);">Total HT</span><span style="text-align: right;">{{ totalHT }}</span>
+              <span style="color: var(--color-neutral-700);">TVA 18 %</span><span style="text-align: right;">{{ totalTVA }}</span>
+              <span style="font-family: var(--font-heading); font-size: 24px; font-weight: 600; padding-top: 6px;">Net à payer</span>
+              <span style="text-align: right; font-family: var(--font-heading); font-size: 24px; font-weight: 600; padding-top: 6px;">{{ totalTTC }}</span>
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px;">
+              <sc-for list="{{ paiements }}" as="p" hint-placeholder-count="4">
+                <button onClick="{{ p.pick }}" style="{{ p.style }}">{{ p.label }}</button>
+              </sc-for>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 18px;">
+              <button class="btn btn-primary" style="font-size: 15px;" onClick="{{ onEncaisser }}">Encaisser &amp; imprimer</button>
+              <button class="btn btn-ghost" style="font-size: 15px;" onClick="{{ onDevis }}">Éditer un devis</button>
+            </div>
+            <div style="font-size: 13px; color: var(--color-accent-2-700); margin-top: 10px; min-height: 18px;">{{ posMsg }}</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isFact }}" hint-placeholder-val="{{ true }}">
+        <h1 style="font-size: 40px; margin: 0 0 4px; letter-spacing: -0.02em;">Facturation</h1>
+        <p style="margin: 0 0 22px; color: var(--color-neutral-600);">Devis, factures normalisées, bons de livraison et avoirs</p>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap;">
+          <sc-for list="{{ docTabs }}" as="t" hint-placeholder-count="5">
+            <button onClick="{{ t.pick }}" style="{{ t.style }}">{{ t.label }}</button>
+          </sc-for>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.25fr 1fr; gap: 48px; align-items: start;">
+          <table class="table" style="width: 100%; font-size: 14px;">
+            <thead><tr>
+              <th style="text-align: left;">Pièce</th><th style="text-align: left;">Client</th>
+              <th style="text-align: right;">TTC</th><th style="text-align: left;">État</th>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ docs }}" as="d" hint-placeholder-count="6">
+                <tr onClick="{{ d.open }}" style="cursor: pointer;">
+                  <td style="font-variant-numeric: tabular-nums;">{{ d.no }}<div style="font-size: 12px; color: var(--color-neutral-600);">{{ d.date }} · {{ d.type }}</div></td>
+                  <td>{{ d.client }}<div style="font-size: 12px; color: var(--color-neutral-600);">{{ d.depot }}</div></td>
+                  <td style="text-align: right; font-variant-numeric: tabular-nums;">{{ d.ttc }}</td>
+                  <td><span class="{{ d.tagClass }}" style="font-size: 11px;">{{ d.etat }}</span></td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+
+          <div>
+            <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 10px;">Aperçu — {{ sel.no }}</div>
+            <div style="background: #fff; box-shadow: var(--shadow-md); padding: 26px 24px;">
+              <div style="display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--color-text); padding-bottom: 8px;">
+                <span style="font-family: var(--font-heading); font-size: 22px; font-weight: 700;">G&amp;E</span>
+                <span style="font-size: 12px; text-align: right; color: var(--color-neutral-700);">Abidjan · RCCM CI-ABJ-2024-B-0000<br>Régime réel · TVA 18 %</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; margin: 16px 0 14px; font-size: 13px;">
+                <span><b>{{ sel.type }} {{ sel.no }}</b><br>{{ sel.date }}<br>{{ sel.depot }}</span>
+                <span style="text-align: right;"><b>{{ sel.client }}</b><br>{{ sel.clientInfo }}</span>
+              </div>
+              <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+                <thead><tr style="border-bottom: 1px solid var(--color-divider);">
+                  <th style="text-align: left; padding: 4px 0; font-weight: 600;">Désignation</th>
+                  <th style="text-align: right; font-weight: 600;">Qté</th>
+                  <th style="text-align: right; font-weight: 600;">P.U.</th>
+                  <th style="text-align: right; font-weight: 600;">Montant</th>
+                </tr></thead>
+                <tbody>
+                  <sc-for list="{{ sel.lignes }}" as="l" hint-placeholder-count="3">
+                    <tr style="border-bottom: 1px solid var(--color-neutral-200);">
+                      <td style="padding: 5px 0;">{{ l.nom }}<div style="font-size: 11px; color: var(--color-neutral-600);">{{ l.ref }}</div></td>
+                      <td style="text-align: right; font-variant-numeric: tabular-nums;">{{ l.qte }}</td>
+                      <td style="text-align: right; font-variant-numeric: tabular-nums;">{{ l.pu }}</td>
+                      <td style="text-align: right; font-variant-numeric: tabular-nums;">{{ l.montant }}</td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+              <div style="display: grid; grid-template-columns: 1fr auto; gap: 3px 12px; font-size: 13px; margin-top: 12px; font-variant-numeric: tabular-nums;">
+                <span>Total HT</span><span style="text-align: right;">{{ sel.ht }}</span>
+                <span>TVA 18 %</span><span style="text-align: right;">{{ sel.tva }}</span>
+                <span style="font-weight: 700; font-size: 16px;">Net à payer</span><span style="text-align: right; font-weight: 700; font-size: 16px;">{{ sel.ttc }}</span>
+              </div>
+              <div style="font-size: 11px; color: var(--color-neutral-600); margin-top: 14px;">Arrêtée la présente facture à la somme de {{ sel.lettres }}.</div>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap;">
+              <button class="btn btn-primary" style="font-size: 14px;" onClick="{{ onConvert }}">{{ convertLabel }}</button>
+              <button class="btn btn-secondary" style="font-size: 14px;" onClick="{{ onPrint80 }}">Ticket 80 mm</button>
+              <button class="btn btn-ghost" style="font-size: 14px;" onClick="{{ onAvoir }}">Avoir</button>
+            </div>
+            <div style="font-size: 13px; color: var(--color-accent-2-700); margin-top: 8px; min-height: 18px;">{{ factMsg }}</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isStock }}" hint-placeholder-val="{{ true }}">
+        <h1 style="font-size: 40px; margin: 0 0 4px; letter-spacing: -0.02em;">Stock multi-dépôts</h1>
+        <p style="margin: 0 0 26px; color: var(--color-neutral-600);">Le dépôt principal d'Adjamé approvisionne les quatre dépôts secondaires</p>
+        <table class="table" style="width: 100%; font-size: 14px;">
+          <thead><tr>
+            <th style="text-align: left;">Référence</th>
+            <sc-for list="{{ depots }}" as="d" hint-placeholder-count="5"><th style="text-align: right;">{{ d.short }}</th></sc-for>
+            <th style="text-align: right;">Total</th><th style="text-align: right;">Seuil</th><th style="text-align: left;">État</th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ stockRows }}" as="r" hint-placeholder-count="10">
+              <tr>
+                <td style="font-weight: 600;">{{ r.nom }}<div style="font-size: 12px; font-weight: 400; color: var(--color-neutral-600);">{{ r.ref }}</div></td>
+                <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="5">
+                  <td style="text-align: right; font-variant-numeric: tabular-nums; color: {{ c.color }};">{{ c.q }}</td>
+                </sc-for>
+                <td style="text-align: right; font-variant-numeric: tabular-nums; font-weight: 600;">{{ r.total }}</td>
+                <td style="text-align: right; font-variant-numeric: tabular-nums; color: var(--color-neutral-600);">{{ r.seuil }}</td>
+                <td><span class="{{ r.tagClass }}" style="font-size: 11px;">{{ r.etat }}</span></td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </sc-if>
+
+      <sc-if value="{{ isTrans }}" hint-placeholder-val="{{ true }}">
+        <h1 style="font-size: 40px; margin: 0 0 4px; letter-spacing: -0.02em;">Transferts inter-dépôts</h1>
+        <p style="margin: 0 0 26px; color: var(--color-neutral-600);">Bons de sortie du dépôt principal vers les secondaires</p>
+        <sc-for list="{{ transfers }}" as="t" hint-placeholder-count="4">
+          <div style="display: grid; grid-template-columns: 130px 1fr 200px 150px; gap: 20px; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--color-divider);">
+            <div style="font-variant-numeric: tabular-nums;">{{ t.no }}<div style="font-size: 12px; color: var(--color-neutral-600);">{{ t.date }}</div></div>
+            <div>
+              <div style="font-weight: 600;">{{ t.route }}</div>
+              <div style="font-size: 13px; color: var(--color-neutral-600);">{{ t.detail }}</div>
+            </div>
+            <div><span class="{{ t.tagClass }}" style="font-size: 11px;">{{ t.etat }}</span> <span style="font-size: 13px; color: var(--color-neutral-600);">· {{ t.qte }} pièces</span></div>
+            <div style="text-align: right;"><button class="{{ t.btnClass }}" style="font-size: 13px;" onClick="{{ t.advance }}">{{ t.action }}</button></div>
+          </div>
+        </sc-for>
+      </sc-if>
+
+      <sc-if value="{{ isAchat }}" hint-placeholder-val="{{ true }}">
+        <h1 style="font-size: 40px; margin: 0 0 4px; letter-spacing: -0.02em;">Achats &amp; fournisseurs</h1>
+        <p style="margin: 0 0 34px; color: var(--color-neutral-600);">Commandes en cours et encours fournisseurs</p>
+        <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 56px; align-items: start;">
+          <div>
+            <h2 style="font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin: 0 0 14px; color: var(--color-neutral-700);">Commandes fournisseurs</h2>
+            <sc-for list="{{ commandes }}" as="c" hint-placeholder-count="4">
+              <div style="padding: 12px 0; border-bottom: 1px solid var(--color-divider);">
+                <div style="display: flex; justify-content: space-between; gap: 12px;">
+                  <span style="font-weight: 600;">{{ c.fournisseur }}</span>
+                  <span style="font-variant-numeric: tabular-nums;">{{ c.montant }}</span>
+                </div>
+                <div style="font-size: 13px; color: var(--color-neutral-600);">{{ c.no }} · {{ c.date }} · {{ c.lignes }} lignes · <span class="{{ c.tagClass }}" style="font-size: 11px;">{{ c.etat }}</span></div>
+              </div>
+            </sc-for>
+          </div>
+          <div>
+            <h2 style="font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; margin: 0 0 14px; color: var(--color-neutral-700);">Fournisseurs</h2>
+            <sc-for list="{{ fournisseurs }}" as="f" hint-placeholder-count="5">
+              <div style="padding: 11px 0; border-bottom: 1px solid var(--color-divider);">
+                <div style="display: flex; justify-content: space-between; gap: 12px;">
+                  <span style="font-weight: 600;">{{ f.nom }}</span>
+                  <span style="font-variant-numeric: tabular-nums; color: var(--color-neutral-700);">{{ f.encours }}</span>
+                </div>
+                <div style="font-size: 13px; color: var(--color-neutral-600);">{{ f.pays }} · {{ f.familles }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isRh }}" hint-placeholder-val="{{ true }}">
+        <h1 style="font-size: 40px; margin: 0 0 4px; letter-spacing: -0.02em;">Personnel &amp; droits</h1>
+        <p style="margin: 0 0 26px; color: var(--color-neutral-600);">{{ staffCount }} collaborateurs · rôles Firebase appliqués à la connexion</p>
+        <table class="table" style="width: 100%; font-size: 14px;">
+          <thead><tr>
+            <th style="text-align: left;">Collaborateur</th><th style="text-align: left;">Rôle</th>
+            <th style="text-align: left;">Dépôt</th><th style="text-align: left;">Droits</th><th style="text-align: left;">État</th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ staff }}" as="s" hint-placeholder-count="7">
+              <tr>
+                <td style="font-weight: 600;">{{ s.nom }}<div style="font-size: 12px; font-weight: 400; color: var(--color-neutral-600);">{{ s.tel }}</div></td>
+                <td>{{ s.role }}</td>
+                <td>{{ s.depot }}</td>
+                <td style="font-size: 13px; color: var(--color-neutral-700);">{{ s.droits }}</td>
+                <td><span class="{{ s.tagClass }}" style="font-size: 11px;">{{ s.etat }}</span></td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </sc-if>
+
+    </main>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isMobileView }}" hint-placeholder-val="{{ false }}">
+    <div style="display: flex; gap: 56px; justify-content: center; padding: 44px 40px 80px; flex-wrap: wrap;">
+
+      <div>
+        <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 12px;">Android · vente comptoir</div>
+        <div style="width: 340px; height: 700px; background: #fff; box-shadow: var(--shadow-lg); border-radius: 22px; overflow: hidden; display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; padding: 9px 16px 4px; font-size: 12px; color: var(--color-neutral-700);"><span>08:42</span><span>Orange CI · 84 %</span></div>
+          <div style="padding: 6px 18px 12px; border-bottom: 2px solid var(--color-text); display: flex; justify-content: space-between; align-items: baseline;">
+            <span style="font-family: var(--font-heading); font-size: 22px; font-weight: 700;">G&amp;E</span>
+            <span style="font-size: 12px; color: var(--color-neutral-600);">Yopougon</span>
+          </div>
+          <div style="padding: 16px 18px; flex: 1; overflow: auto;">
+            <div style="border: 1px dashed var(--color-accent); padding: 22px 12px; text-align: center; color: var(--color-accent-700); font-size: 14px; margin-bottom: 18px;">Scanner le code-barres</div>
+            <sc-for list="{{ cart }}" as="l" hint-placeholder-count="3">
+              <div style="display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--color-divider);">
+                <span style="font-size: 14px;"><b>{{ l.nom }}</b><span style="display: block; font-size: 12px; color: var(--color-neutral-600);">{{ l.qte }} × {{ l.pu }}</span></span>
+                <span style="font-size: 14px; font-variant-numeric: tabular-nums;">{{ l.total }}</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
+              <p style="font-style: italic; color: var(--color-neutral-600); font-size: 14px;">Ticket vide — ajoutez des pièces depuis la vue Bureau ou scannez.</p>
+            </sc-if>
+          </div>
+          <div style="padding: 14px 18px 20px; border-top: 1px solid var(--color-divider);">
+            <div style="display: flex; justify-content: space-between; font-family: var(--font-heading); font-size: 21px; font-weight: 600; margin-bottom: 10px;"><span>Total TTC</span><span>{{ totalTTC }}</span></div>
+            <button class="btn btn-primary btn-block" style="font-size: 15px;" onClick="{{ onEncaisser }}">Encaisser</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 12px;">Android · consultation du stock</div>
+        <div style="width: 340px; height: 700px; background: #fff; box-shadow: var(--shadow-lg); border-radius: 22px; overflow: hidden; display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; padding: 9px 16px 4px; font-size: 12px; color: var(--color-neutral-700);"><span>08:42</span><span>Hors-ligne · file 3</span></div>
+          <div style="padding: 6px 18px 12px; border-bottom: 2px solid var(--color-text);">
+            <input class="input" style="width: 100%; font-family: var(--font-body); font-size: 14px;" placeholder="Réf., OEM, désignation" value="{{ q }}" onChange="{{ onQ }}">
+          </div>
+          <div style="padding: 8px 18px 20px; flex: 1; overflow: auto;">
+            <sc-for list="{{ parts }}" as="p" hint-placeholder-count="6">
+              <div style="padding: 11px 0; border-bottom: 1px solid var(--color-divider);">
+                <div style="display: flex; justify-content: space-between; gap: 10px;">
+                  <span style="font-weight: 600; font-size: 14px;">{{ p.nom }}</span>
+                  <span style="font-size: 14px; font-variant-numeric: tabular-nums;">{{ p.pv }}</span>
+                </div>
+                <div style="font-size: 12px; color: var(--color-neutral-600);">{{ p.ref }} · {{ p.repartition }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:940}}">
+const DEPOTS = [
+  { id: "P", short: "ADJ", label: "Adjamé — principal", name: "Adjamé (principal)" },
+  { id: "Y", short: "YOP", label: "Yopougon", name: "Yopougon" },
+  { id: "T", short: "TRE", label: "Treichville", name: "Treichville" },
+  { id: "B", short: "BKE", label: "Bouaké", name: "Bouaké" },
+  { id: "S", short: "SPD", label: "San-Pédro", name: "San-Pédro" }
+];
+
+const PARTS = [
+  { ref: "BRK-1042", oem: "45022-SNA-A00", nom: "Plaquettes de frein avant", cat: "Freinage", marque: "Toyota", compat: "Corolla / Yaris 2014-2021", pv: 19500, seuil: 20, cb: "6001234500123", st: { P: 42, Y: 8, T: 14, B: 0, S: 5 } },
+  { ref: "BRK-2210", oem: "43512-02280", nom: "Disque de frein ventilé Ø275", cat: "Freinage", marque: "Toyota", compat: "Corolla 2013-2019", pv: 34000, seuil: 12, cb: "6001234500147", st: { P: 26, Y: 4, T: 6, B: 3, S: 2 } },
+  { ref: "FIL-0301", oem: "15208-65F0A", nom: "Filtre à huile", cat: "Filtration", marque: "Nissan", compat: "Qashqai / X-Trail 2012-2020", pv: 4500, seuil: 60, cb: "6001234500231", st: { P: 180, Y: 42, T: 55, B: 18, S: 24 } },
+  { ref: "FIL-0455", oem: "17801-0H080", nom: "Filtre à air moteur", cat: "Filtration", marque: "Toyota", compat: "Hilux 2016-2023", pv: 9800, seuil: 40, cb: "6001234500248", st: { P: 96, Y: 12, T: 20, B: 7, S: 11 } },
+  { ref: "SUS-7712", oem: "48510-09L60", nom: "Amortisseur avant gauche", cat: "Suspension", marque: "Toyota", compat: "Hilux Vigo 2011-2018", pv: 62000, seuil: 8, cb: "6001234500330", st: { P: 18, Y: 2, T: 3, B: 1, S: 0 } },
+  { ref: "SUS-7745", oem: "54560-3TA0A", nom: "Biellette de barre stabilisatrice", cat: "Suspension", marque: "Nissan", compat: "Almera / Sunny 2012-2019", pv: 11500, seuil: 24, cb: "6001234500354", st: { P: 51, Y: 9, T: 12, B: 6, S: 4 } },
+  { ref: "ELE-3120", oem: "28800-0T010", nom: "Batterie 12 V 70 Ah", cat: "Électricité", marque: "Universel", compat: "Berlines et 4×4 essence", pv: 78000, seuil: 15, cb: "6001234500422", st: { P: 34, Y: 11, T: 9, B: 5, S: 6 } },
+  { ref: "ELE-3355", oem: "90919-01253", nom: "Bougie d'allumage iridium", cat: "Électricité", marque: "Toyota", compat: "Corolla / RAV4 essence", pv: 6800, seuil: 80, cb: "6001234500446", st: { P: 220, Y: 48, T: 62, B: 30, S: 26 } },
+  { ref: "MOT-5090", oem: "13568-39016", nom: "Kit distribution courroie", cat: "Moteur", marque: "Toyota", compat: "Hilux 2.5 D-4D", pv: 96000, seuil: 6, cb: "6001234500514", st: { P: 12, Y: 1, T: 2, B: 0, S: 1 } },
+  { ref: "CON-9001", oem: "—", nom: "Huile moteur 5W-40 · bidon 5 L", cat: "Consommables", marque: "Total", compat: "Diesel et essence", pv: 27500, seuil: 100, cb: "6001234500606", st: { P: 260, Y: 64, T: 78, B: 32, S: 40 } },
+  { ref: "CON-9042", oem: "—", nom: "Liquide de refroidissement 5 L", cat: "Consommables", marque: "Total", compat: "Tous véhicules", pv: 13500, seuil: 60, cb: "6001234500620", st: { P: 140, Y: 22, T: 31, B: 14, S: 9 } },
+  { ref: "ACC-4410", oem: "—", nom: "Tapis de sol caoutchouc — jeu de 4", cat: "Accessoires", marque: "Universel", compat: "Berlines", pv: 16500, seuil: 30, cb: "6001234500712", st: { P: 74, Y: 18, T: 26, B: 12, S: 15 } },
+  { ref: "ACC-4488", oem: "—", nom: "Housse de siège simili — jeu complet", cat: "Accessoires", marque: "Universel", compat: "Berlines et SUV", pv: 45000, seuil: 12, cb: "6001234500736", st: { P: 22, Y: 5, T: 8, B: 2, S: 3 } }
+];
+
+const DOCS = [
+  { no: "FA-2026-0418", type: "Facture", date: "01/09/2026", client: "Garage Sotra Auto", clientInfo: "Cpte 0142 · crédit 30 j · CC 1802742T", depot: "Adjamé", etat: "Payée", lignes: [["BRK-1042", "Plaquettes de frein avant", 12, 19500], ["FIL-0301", "Filtre à huile", 40, 4500], ["CON-9001", "Huile 5W-40 5 L", 15, 27500]] },
+  { no: "DV-2026-0207", type: "Devis", date: "01/09/2026", client: "Transports Kouassi & Fils", clientInfo: "Cpte 0311 · comptant", depot: "Yopougon", etat: "En attente", lignes: [["SUS-7712", "Amortisseur avant gauche", 4, 62000], ["MOT-5090", "Kit distribution courroie", 2, 96000]] },
+  { no: "FA-2026-0417", type: "Facture", date: "31/08/2026", client: "Auto Service Treichville", clientInfo: "Cpte 0088 · crédit 15 j", depot: "Treichville", etat: "Impayée", lignes: [["ELE-3120", "Batterie 12 V 70 Ah", 6, 78000], ["ELE-3355", "Bougie iridium", 24, 6800]] },
+  { no: "BL-2026-0166", type: "Bon de livraison", date: "31/08/2026", client: "Flotte SODECI Bouaké", clientInfo: "Marché cadre 2026-14", depot: "Bouaké", etat: "Livré", lignes: [["FIL-0455", "Filtre à air moteur", 30, 9800], ["CON-9042", "Liquide de refroidissement", 20, 13500]] },
+  { no: "AV-2026-0021", type: "Avoir", date: "29/08/2026", client: "Garage Sotra Auto", clientInfo: "Retour réf. BRK-2210", depot: "Adjamé", etat: "Validé", lignes: [["BRK-2210", "Disque de frein ventilé", 2, 34000]] },
+  { no: "FA-2026-0415", type: "Facture", date: "28/08/2026", client: "Taxi-compagnie Wôrô", clientInfo: "Cpte 0245 · comptant", depot: "San-Pédro", etat: "Payée", lignes: [["ACC-4410", "Tapis de sol", 10, 16500], ["ACC-4488", "Housse de siège", 4, 45000]] }
+];
+
+const TRANSFERS = [
+  { no: "TR-0912", date: "01/09/2026", to: "Yopougon", detail: "Freinage, filtration — 6 références", qte: 148, etat: "Préparé" },
+  { no: "TR-0911", date: "01/09/2026", to: "Bouaké", detail: "Consommables, batteries — 4 références", qte: 92, etat: "En route" },
+  { no: "TR-0908", date: "30/08/2026", to: "San-Pédro", detail: "Suspension, moteur — 5 références", qte: 37, etat: "Reçu" },
+  { no: "TR-0907", date: "29/08/2026", to: "Treichville", detail: "Accessoires — 3 références", qte: 64, etat: "Reçu" }
+];
+
+const CMD = [
+  { no: "CF-2026-0074", fournisseur: "Denso Middle East FZE", date: "28/08/2026", lignes: 18, montant: 14250000, etat: "En transit" },
+  { no: "CF-2026-0073", fournisseur: "Bosch Automotive Maroc", date: "22/08/2026", lignes: 26, montant: 9840000, etat: "Réceptionnée" },
+  { no: "CF-2026-0072", fournisseur: "Total Énergies CI", date: "18/08/2026", lignes: 6, montant: 6120000, etat: "Réceptionnée" },
+  { no: "CF-2026-0071", fournisseur: "Sino Parts Trading Ltd", date: "10/08/2026", lignes: 41, montant: 21500000, etat: "Dédouanement" }
+];
+
+const FRN = [
+  { nom: "Denso Middle East FZE", pays: "Émirats arabes unis", familles: "Électricité, filtration", encours: 14250000 },
+  { nom: "Bosch Automotive Maroc", pays: "Maroc", familles: "Freinage, allumage", encours: 3200000 },
+  { nom: "Total Énergies CI", pays: "Côte d'Ivoire", familles: "Consommables", encours: 0 },
+  { nom: "Sino Parts Trading Ltd", pays: "Chine", familles: "Suspension, accessoires", encours: 21500000 },
+  { nom: "Ivoire Pneus & Accessoires", pays: "Côte d'Ivoire", familles: "Accessoires", encours: 780000 }
+];
+
+const STAFF = [
+  { nom: "Kouadio Assamoi", tel: "+225 07 08 41 22", role: "Directeur général", depot: "Tous dépôts", droits: "Accès complet, clôture de caisse, remises", etat: "Actif" },
+  { nom: "Mariam Koné", tel: "+225 05 74 10 03", role: "Caissière", depot: "Adjamé", droits: "Vente, encaissement, ticket 80 mm", etat: "Actif" },
+  { nom: "Yao N'Guessan", tel: "+225 01 42 88 76", role: "Vendeur comptoir", depot: "Adjamé", droits: "Vente, devis, consultation stock", etat: "Actif" },
+  { nom: "Aïcha Traoré", tel: "+225 07 91 30 55", role: "Responsable de dépôt", depot: "Yopougon", droits: "Réception, transferts, inventaire", etat: "Actif" },
+  { nom: "Serge Bamba", tel: "+225 05 12 66 09", role: "Responsable de dépôt", depot: "Bouaké", droits: "Réception, transferts, inventaire", etat: "Actif" },
+  { nom: "Fatou Diarra", tel: "+225 01 77 45 18", role: "Comptable", depot: "Tous dépôts", droits: "Facturation, avoirs, encours clients", etat: "Actif" },
+  { nom: "Ibrahim Cissé", tel: "+225 07 22 91 40", role: "Vendeur comptoir", depot: "San-Pédro", droits: "Vente, consultation stock", etat: "Suspendu" }
+];
+
+const NAV = [
+  ["dash", "Tableau de bord"], ["cat", "Catalogue"], ["pos", "Vente comptoir"], ["fact", "Facturation"],
+  ["stock", "Stock multi-dépôts"], ["trans", "Transferts"], ["achat", "Achats & fournisseurs"], ["rh", "Personnel & droits"]
+];
+
+const TABS = ["Tous", "Devis", "Facture", "Bon de livraison", "Avoir"];
+const PAY = ["Espèces", "Mobile money", "Carte", "Crédit client"];
+
+const f = (n) => new Intl.NumberFormat("fr-FR").format(Math.round(n)) + " F";
+
+class Component extends DCLogic {
+  state = {
+    view: "desktop", module: "dash", depotId: "P", q: "", marque: "Toutes", cat: "Toutes",
+    cart: [], pay: "Espèces", posMsg: "", scanHint: "Douchette USB / caméra Android — le code renseigne la recherche.",
+    tab: "Tous", selNo: "FA-2026-0418", factMsg: "", transfers: TRANSFERS.map((t) => Object.assign({}, t))
+  };
+
+  go = (m) => this.setState({ module: m, posMsg: "", factMsg: "" });
+
+  add = (p) => this.setState((s) => {
+    const cart = s.cart.slice();
+    const i = cart.findIndex((l) => l.ref === p.ref);
+    if (i >= 0) cart[i] = Object.assign({}, cart[i], { qte: cart[i].qte + 1 });
+    else cart.push({ ref: p.ref, nom: p.nom, pu: p.pv, qte: 1 });
+    return { cart, module: s.module === "cat" ? "pos" : s.module, posMsg: "" };
+  });
+
+  bump = (ref, d) => this.setState((s) => ({
+    cart: s.cart.map((l) => (l.ref === ref ? Object.assign({}, l, { qte: l.qte + d }) : l)).filter((l) => l.qte > 0)
+  }));
+
+  advance = (no) => this.setState((s) => ({
+    transfers: s.transfers.map((t) => {
+      if (t.no !== no) return t;
+      const next = { "Préparé": "En route", "En route": "Reçu" }[t.etat];
+      return next ? Object.assign({}, t, { etat: next }) : t;
+    })
+  }));
+
+  filtered() {
+    const { q, marque, cat } = this.state;
+    const s = q.trim().toLowerCase();
+    return PARTS.filter((p) =>
+      (marque === "Toutes" || p.marque === marque) &&
+      (cat === "Toutes" || p.cat === cat) &&
+      (!s || [p.ref, p.oem, p.nom, p.cat, p.compat, p.cb].join(" ").toLowerCase().includes(s))
+    );
+  }
+
+  pill(active) {
+    return "font-family: var(--font-body); font-size: 13px; padding: 5px 13px; cursor: pointer; border-radius: var(--radius-md); border: 1px solid " +
+      (active ? "var(--color-accent-700)" : "var(--color-neutral-300)") +
+      "; background: " + (active ? "var(--color-accent-700)" : "transparent") +
+      "; color: " + (active ? "#fff" : "var(--color-neutral-800)") + ";";
+  }
+
+  renderVals() {
+    const st = this.state;
+    const dep = DEPOTS.find((d) => d.id === st.depotId) || DEPOTS[0];
+    const parts = this.filtered();
+    const totalHT = st.cart.reduce((a, l) => a + l.pu * l.qte, 0);
+
+    const doc = DOCS.find((d) => d.no === st.selNo) || DOCS[0];
+    const docHT = doc.lignes.reduce((a, l) => a + l[2] * l[3], 0);
+    const docTag = (e) => ({ "Payée": "tag tag-accent", "Impayée": "tag tag-accent-2", "En attente": "tag tag-outline", "Livré": "tag tag-neutral", "Validé": "tag tag-neutral" }[e] || "tag tag-neutral");
+
+    const caDepots = [
+      { name: "Adjamé (principal)", v: 48200000 }, { name: "Yopougon", v: 19400000 },
+      { name: "Treichville", v: 16100000 }, { name: "Bouaké", v: 9700000 }, { name: "San-Pédro", v: 7300000 }
+    ];
+    const maxCa = caDepots[0].v;
+
+    const alerts = [];
+    PARTS.forEach((p) => DEPOTS.forEach((d) => {
+      const q = p.st[d.id];
+      if (q <= Math.round(p.seuil / 4)) alerts.push({ nom: p.nom, ref: p.ref, seuil: p.seuil, depot: d.name, qte: q + " en stock" });
+    }));
+
+    return {
+      isDesktop: st.view === "desktop", isMobileView: st.view === "mobile",
+      onDesktop: () => this.setState({ view: "desktop" }), onMobile: () => this.setState({ view: "mobile" }),
+      depots: DEPOTS, depotId: st.depotId, depotName: dep.name,
+      onDepot: (e) => this.setState({ depotId: e.target.value }),
+      today: "Mardi 1er septembre 2026",
+      syncLabel: "à jour — 08:41",
+
+      nav: NAV.map(([id, label]) => ({
+        label, go: () => this.go(id),
+        style: "text-align: left; background: none; border: 0; padding: 6px 0; cursor: pointer; font-family: var(--font-body); font-size: 16px; letter-spacing: -0.01em; color: " +
+          (st.module === id ? "var(--color-text)" : "var(--color-neutral-600)") +
+          "; font-weight: " + (st.module === id ? "700" : "400") + ";"
+      })),
+
+      isDash: st.module === "dash", isCat: st.module === "cat", isPos: st.module === "pos",
+      isFact: st.module === "fact", isStock: st.module === "stock", isTrans: st.module === "trans",
+      isAchat: st.module === "achat", isRh: st.module === "rh",
+
+      kpis: [
+        { label: "CA du jour", value: "2 148 500 F", note: "37 tickets · +12 % vs hier" },
+        { label: "Encours clients", value: "8,4 M F", note: "dont 1,9 M échu" },
+        { label: "Valeur du stock", value: "312 M F", note: "5 dépôts · 1 284 références" },
+        { label: "Sous le seuil", value: String(alerts.length), note: "lignes à réapprovisionner" }
+      ],
+      depotStats: caDepots.map((d) => ({ name: d.name, ca: f(d.v), pct: Math.round((d.v / maxCa) * 100) + "%" })),
+      alerts: alerts.slice(0, 6),
+
+      q: st.q, onQ: (e) => this.setState({ q: e.target.value }),
+      marque: st.marque, onMarque: (e) => this.setState({ marque: e.target.value }),
+      cat: st.cat, onCat: (e) => this.setState({ cat: e.target.value }),
+      marques: ["Toutes"].concat(Array.from(new Set(PARTS.map((p) => p.marque)))),
+      cats: ["Toutes"].concat(Array.from(new Set(PARTS.map((p) => p.cat)))),
+      onScan: () => this.setState({ q: "6001234500123", scanHint: "Code 6001234500123 lu — plaquettes de frein avant." }),
+      scanHint: st.scanHint,
+      catCount: parts.length,
+
+      parts: parts.map((p) => ({
+        ref: p.ref, oem: p.oem, nom: p.nom, cat: p.cat, compat: p.compat, pv: f(p.pv),
+        total: Object.values(p.st).reduce((a, b) => a + b, 0),
+        dispo: p.st[st.depotId],
+        repartition: DEPOTS.map((d) => d.short + " " + p.st[d.id]).join(" · "),
+        addToCart: () => this.add(p)
+      })),
+
+      ticketNo: "TK-2026-09-0138",
+      cart: st.cart.map((l) => ({
+        ref: l.ref, nom: l.nom, qte: l.qte, pu: f(l.pu), total: f(l.pu * l.qte),
+        inc: () => this.bump(l.ref, 1), dec: () => this.bump(l.ref, -1)
+      })),
+      cartEmpty: st.cart.length === 0,
+      totalHT: f(totalHT), totalTVA: f(totalHT * 0.18), totalTTC: f(totalHT * 1.18),
+      paiements: PAY.map((p) => ({ label: p, pick: () => this.setState({ pay: p }), style: this.pill(st.pay === p) })),
+      onEncaisser: () => this.setState((s) => s.cart.length
+        ? { cart: [], posMsg: "Encaissé en " + s.pay.toLowerCase() + " — ticket 80 mm envoyé à l'imprimante, stock décrémenté sur Firebase." }
+        : { posMsg: "Ticket vide." }),
+      onDevis: () => this.setState((s) => ({ posMsg: s.cart.length ? "Devis DV-2026-0208 créé, valable 15 jours." : "Ticket vide." })),
+      posMsg: st.posMsg,
+
+      docTabs: TABS.map((t) => ({ label: t, pick: () => this.setState({ tab: t }), style: this.pill(st.tab === t) })),
+      docs: DOCS.filter((d) => st.tab === "Tous" || d.type === st.tab).map((d) => ({
+        no: d.no, date: d.date, type: d.type, client: d.client, depot: d.depot, etat: d.etat,
+        tagClass: docTag(d.etat),
+        ttc: f(d.lignes.reduce((a, l) => a + l[2] * l[3], 0) * 1.18),
+        open: () => this.setState({ selNo: d.no, factMsg: "" })
+      })),
+      sel: {
+        no: doc.no, type: doc.type, date: doc.date, client: doc.client, clientInfo: doc.clientInfo, depot: doc.depot,
+        lignes: doc.lignes.map((l) => ({ ref: l[0], nom: l[1], qte: l[2], pu: f(l[3]), montant: f(l[2] * l[3]) })),
+        ht: f(docHT), tva: f(docHT * 0.18), ttc: f(docHT * 1.18),
+        lettres: f(docHT * 1.18).replace(" F", " francs CFA")
+      },
+      convertLabel: doc.type === "Devis" ? "Convertir en facture" : "Dupliquer",
+      onConvert: () => this.setState({ factMsg: doc.type === "Devis" ? "Devis converti — facture FA-2026-0419 émise et stock réservé." : "Copie créée en brouillon." }),
+      onPrint80: () => this.setState({ factMsg: "Rendu 80 mm envoyé à l'imprimante thermique du comptoir." }),
+      onAvoir: () => this.setState({ factMsg: "Avoir AV-2026-0022 initialisé sur " + doc.no + "." }),
+      factMsg: st.factMsg,
+
+      stockRows: PARTS.map((p) => {
+        const total = Object.values(p.st).reduce((a, b) => a + b, 0);
+        const bas = total < p.seuil;
+        return {
+          nom: p.nom, ref: p.ref, seuil: p.seuil, total,
+          cells: DEPOTS.map((d) => ({ q: p.st[d.id], color: p.st[d.id] === 0 ? "var(--color-accent-2-700)" : "var(--color-text)" })),
+          etat: bas ? "À réapprovisionner" : "Suffisant",
+          tagClass: bas ? "tag tag-accent-2" : "tag tag-neutral"
+        };
+      }),
+
+      transfers: st.transfers.map((t) => ({
+        no: t.no, date: t.date, detail: t.detail, qte: t.qte, etat: t.etat,
+        route: "Adjamé → " + t.to,
+        tagClass: t.etat === "Reçu" ? "tag tag-neutral" : t.etat === "En route" ? "tag tag-accent" : "tag tag-outline",
+        action: t.etat === "Préparé" ? "Expédier" : t.etat === "En route" ? "Valider réception" : "Clôturé",
+        btnClass: t.etat === "Reçu" ? "btn btn-ghost" : "btn btn-secondary",
+        advance: () => this.advance(t.no)
+      })),
+
+      commandes: CMD.map((c) => ({
+        no: c.no, fournisseur: c.fournisseur, date: c.date, lignes: c.lignes, montant: f(c.montant), etat: c.etat,
+        tagClass: c.etat === "Réceptionnée" ? "tag tag-neutral" : c.etat === "En transit" ? "tag tag-accent" : "tag tag-outline"
+      })),
+      fournisseurs: FRN.map((x) => ({ nom: x.nom, pays: x.pays, familles: x.familles, encours: x.encours ? f(x.encours) : "soldé" })),
+
+      staff: STAFF.map((s) => ({
+        nom: s.nom, tel: s.tel, role: s.role, depot: s.depot, droits: s.droits, etat: s.etat,
+        tagClass: s.etat === "Actif" ? "tag tag-neutral" : "tag tag-accent-2"
+      })),
+      staffCount: STAFF.length
+    };
+  }
+}
+</script>
+</body>
+</html>
