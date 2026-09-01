@@ -1,21 +1,16 @@
 import { useMemo } from "react";
-import {
-  CA_PAR_DEPOT,
-  DEPOTS,
-  PARTS,
-  depotById,
-  formatCFA,
-  formatDateFR,
-  lowStockAlerts,
-} from "@ge/shared";
+import { DEPOTS, depotById, formatCFA, formatDateFR, lowStockAlerts } from "@ge/shared";
 import { useAppStore } from "../store/appStore";
+import { useFirestoreData } from "../store/firestoreData";
 
 export default function Dashboard() {
   const depotId = useAppStore((s) => s.depotId);
   const depot = depotById(depotId);
+  const parts = useFirestoreData((s) => s.parts);
+  const caParDepot = useFirestoreData((s) => s.caParDepot);
 
-  const alerts = useMemo(() => lowStockAlerts(PARTS, DEPOTS), []);
-  const maxCa = CA_PAR_DEPOT[0]?.v ?? 1;
+  const alerts = useMemo(() => lowStockAlerts(parts, DEPOTS), [parts]);
+  const maxCa = caParDepot[0]?.v ?? 1;
 
   const kpis = [
     { label: "CA du jour", value: "2 148 500 F", note: "37 tickets · +12 % vs hier" },
@@ -44,7 +39,7 @@ export default function Dashboard() {
       <div className="dash-grid">
         <div>
           <h2 className="section-title">Ventes par dépôt — 30 jours</h2>
-          {CA_PAR_DEPOT.map((d) => (
+          {caParDepot.map((d) => (
             <div className="depot-row" key={d.name}>
               <span className="depot-row__name">{d.name}</span>
               <span className="depot-row__bar">

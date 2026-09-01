@@ -97,6 +97,8 @@ export type StaffEtat = "Actif" | "Suspendu";
 export interface StaffMember {
   nom: string;
   tel: string;
+  /** Adresse e-mail — identifiant de connexion Firebase Auth. */
+  email: string;
   role: StaffRole;
   depot: string;
   droits: string;

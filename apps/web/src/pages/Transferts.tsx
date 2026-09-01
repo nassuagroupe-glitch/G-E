@@ -1,4 +1,5 @@
 import { useAppStore } from "../store/appStore";
+import { useFirestoreData } from "../store/firestoreData";
 import type { TransferEtat } from "@ge/shared";
 
 const TAG_CLASS: Record<TransferEtat, string> = {
@@ -14,7 +15,7 @@ const ACTION_LABEL: Record<TransferEtat, string> = {
 };
 
 export default function Transferts() {
-  const transfers = useAppStore((s) => s.transfers);
+  const transfers = useFirestoreData((s) => s.transfers);
   const advanceTransfer = useAppStore((s) => s.advanceTransfer);
 
   return (

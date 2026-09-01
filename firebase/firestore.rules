@@ -1,0 +1,109 @@
+rules_version = '2';
+
+// See firebase/DATA_MODEL.md for the collections and the role → permission
+// table this file implements.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function staffDoc() {
+      return get(/databases/$(database)/documents/staff/$(request.auth.uid)).data;
+    }
+
+    // Any authenticated, non-suspended staff member.
+    function isActiveStaff() {
+      return isSignedIn()
+        && exists(/databases/$(database)/documents/staff/$(request.auth.uid))
+        && staffDoc().etat == 'Actif';
+    }
+
+    function role() {
+      return staffDoc().role;
+    }
+
+    function isDirection() {
+      return isActiveStaff() && role() == 'Directeur général';
+    }
+
+    function isDepotManager() {
+      return isActiveStaff() && role() == 'Responsable de dépôt';
+    }
+
+    function isCashierOrCounter() {
+      return isActiveStaff() && role() in ['Caissière', 'Vendeur comptoir'];
+    }
+
+    function isAccountant() {
+      return isActiveStaff() && role() == 'Comptable';
+    }
+
+    // A depot manager may only touch their own depot's data — matched by
+    // the human-readable depot name stored on both their staff doc and the
+    // resource (docs.depot, transfers.to, parts read is unrestricted).
+    function ownsDepot(depotName) {
+      return isDepotManager() && staffDoc().depot == depotName;
+    }
+
+    match /depots/{depotId} {
+      allow read: if isActiveStaff();
+      allow write: if isDirection();
+    }
+
+    match /parts/{ref} {
+      allow read: if isActiveStaff();
+      // Direction and depot managers adjust catalogue info / stock counts
+      // directly; a cashier or counter clerk's write is always the stock
+      // decrement inside the encaisser() transaction in appStore.ts, paired
+      // with the sales/{ticketNo} create allowed below — not a standalone
+      // catalogue edit, but Firestore rules can't tell the two apart, so
+      // this stays as permissive as the sale flow needs.
+      allow write: if isDirection() || isDepotManager() || isCashierOrCounter();
+    }
+
+    match /sales/{ticketNo} {
+      allow read: if isActiveStaff();
+      allow create: if isCashierOrCounter() || isDirection();
+      allow update, delete: if isDirection();
+    }
+
+    match /docs/{no} {
+      allow read: if isActiveStaff();
+      // A cashier/counter clerk may create a fresh Devis from the POS
+      // screen (editerDevis() in appStore.ts — matches the "devis" droit on
+      // the Vendeur comptoir / Caissière roles), but not a Facture/BL/Avoir,
+      // and not touch an existing doc — converting or crediting one is
+      // Facturation-screen territory, Comptable/Direction only.
+      allow create: if isAccountant() || isDirection()
+        || (isCashierOrCounter() && request.resource.data.type == 'Devis');
+      allow update: if isAccountant() || isDirection();
+      allow delete: if isDirection();
+    }
+
+    match /transfers/{no} {
+      allow read: if isActiveStaff();
+      allow create: if isDirection();
+      // A depot manager may only advance a transfer addressed to their
+      // own depot (Préparé → En route → Reçu).
+      allow update: if isDirection() || ownsDepot(resource.data.to);
+      allow delete: if isDirection();
+    }
+
+    match /purchaseOrders/{no} {
+      allow read: if isActiveStaff();
+      allow write: if isAccountant() || isDirection();
+    }
+
+    match /suppliers/{id} {
+      allow read: if isActiveStaff();
+      allow write: if isAccountant() || isDirection();
+    }
+
+    match /staff/{uid} {
+      allow read: if isSignedIn() && (request.auth.uid == uid || isActiveStaff());
+      allow write: if isDirection();
+    }
+  }
+}

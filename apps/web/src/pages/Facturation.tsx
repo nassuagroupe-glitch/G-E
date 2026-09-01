@@ -1,13 +1,7 @@
 import { useMemo } from "react";
-import {
-  DOC_TABS,
-  DOCS,
-  docTotals,
-  formatCFA,
-  montantEnLettres,
-  type DocEtat,
-} from "@ge/shared";
+import { DOC_TABS, docTotals, formatCFA, montantEnLettres, type DocEtat } from "@ge/shared";
 import { useAppStore } from "../store/appStore";
+import { useFirestoreData } from "../store/firestoreData";
 
 const TAG_CLASS: Record<DocEtat, string> = {
   "Payée": "tag tag-accent",
@@ -27,12 +21,23 @@ export default function Facturation() {
   const convertDoc = useAppStore((s) => s.convertDoc);
   const print80 = useAppStore((s) => s.print80);
   const avoir = useAppStore((s) => s.avoir);
+  const allDocs = useFirestoreData((s) => s.docs);
 
   const docs = useMemo(
-    () => DOCS.filter((d) => tab === "Tous" || d.type === tab),
-    [tab]
+    () => allDocs.filter((d) => tab === "Tous" || d.type === tab),
+    [allDocs, tab]
   );
-  const doc = useMemo(() => DOCS.find((d) => d.no === selNo) ?? DOCS[0], [selNo]);
+  const doc = useMemo(() => allDocs.find((d) => d.no === selNo) ?? allDocs[0], [allDocs, selNo]);
+
+  if (!doc) {
+    return (
+      <>
+        <h1 className="page-title">Facturation</h1>
+        <p className="page-subtitle">Aucun document pour l'instant.</p>
+      </>
+    );
+  }
+
   const totals = docTotals(doc);
   const convertLabel = doc.type === "Devis" ? "Convertir en facture" : "Dupliquer";
 

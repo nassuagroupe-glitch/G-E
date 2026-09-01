@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from "react-router-dom";
+import { useAuth } from "../auth/AuthProvider";
 import { depotOptions, useAppStore } from "../store/appStore";
-import type { DepotId } from "@ge/shared";
+import type { DepotId, StaffMember } from "@ge/shared";
 
 const NAV = [
   { to: "/", label: "Tableau de bord" },
@@ -13,9 +14,10 @@ const NAV = [
   { to: "/rh", label: "Personnel & droits" },
 ];
 
-export default function Layout() {
+export default function Layout({ staff }: { staff: StaffMember }) {
   const depotId = useAppStore((s) => s.depotId);
   const setDepot = useAppStore((s) => s.setDepot);
+  const { signOut } = useAuth();
 
   return (
     <div style={{ minHeight: "100vh" }}>
@@ -39,9 +41,16 @@ export default function Layout() {
             ))}
           </select>
         </div>
-        <div className="app-header__user">
-          <div className="app-header__user-name">K. Assamoi</div>
-          <div className="app-header__user-role">Direction · tous dépôts</div>
+        <div className="app-header__user" style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div>
+            <div className="app-header__user-name">{staff.nom}</div>
+            <div className="app-header__user-role">
+              {staff.role} · {staff.depot}
+            </div>
+          </div>
+          <button className="btn btn-ghost" style={{ fontSize: 13 }} onClick={() => signOut()}>
+            Déconnexion
+          </button>
         </div>
       </header>
 

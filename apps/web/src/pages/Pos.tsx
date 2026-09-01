@@ -1,15 +1,11 @@
 import { useMemo } from "react";
-import {
-  MOYENS_PAIEMENT,
-  PARTS,
-  cartTotals,
-  depotById,
-  filterParts,
-  formatCFA,
-} from "@ge/shared";
+import { MOYENS_PAIEMENT, cartTotals, depotById, filterParts, formatCFA } from "@ge/shared";
+import { useAuth } from "../auth/AuthProvider";
 import { useAppStore } from "../store/appStore";
+import { useFirestoreData } from "../store/firestoreData";
 
 export default function Pos() {
+  const { staff } = useAuth();
   const depotId = useAppStore((s) => s.depotId);
   const q = useAppStore((s) => s.q);
   const marque = useAppStore((s) => s.marque);
@@ -21,18 +17,20 @@ export default function Pos() {
   const pay = useAppStore((s) => s.pay);
   const setPay = useAppStore((s) => s.setPay);
   const posMsg = useAppStore((s) => s.posMsg);
+  const ticketNo = useAppStore((s) => s.ticketNo);
   const encaisser = useAppStore((s) => s.encaisser);
   const editerDevis = useAppStore((s) => s.editerDevis);
+  const allParts = useFirestoreData((s) => s.parts);
 
   const depot = depotById(depotId);
-  const parts = useMemo(() => filterParts(PARTS, { q, marque, cat }), [q, marque, cat]);
+  const parts = useMemo(() => filterParts(allParts, { q, marque, cat }), [allParts, q, marque, cat]);
   const totals = cartTotals(cart);
 
   return (
     <>
       <h1 className="page-title">Vente comptoir</h1>
       <p className="page-subtitle">
-        Ticket TK-2026-09-0138 · {depot.name} · caissier M. Koné
+        Ticket {ticketNo} · {depot.name} · caissier {staff?.nom}
       </p>
 
       <div className="pos-grid">

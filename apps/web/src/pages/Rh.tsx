@@ -1,11 +1,12 @@
-import { STAFF } from "@ge/shared";
+import { useFirestoreData } from "../store/firestoreData";
 
 export default function Rh() {
+  const staff = useFirestoreData((s) => s.staff);
   return (
     <>
       <h1 className="page-title">Personnel &amp; droits</h1>
       <p className="page-subtitle">
-        {STAFF.length} collaborateurs · rôles Firebase appliqués à la connexion
+        {staff.length} collaborateurs · rôles Firebase appliqués à la connexion
       </p>
       <table className="table">
         <thead>
@@ -18,7 +19,7 @@ export default function Rh() {
           </tr>
         </thead>
         <tbody>
-          {STAFF.map((s) => (
+          {staff.map((s) => (
             <tr key={s.tel}>
               <td style={{ fontWeight: 600 }}>
                 {s.nom}

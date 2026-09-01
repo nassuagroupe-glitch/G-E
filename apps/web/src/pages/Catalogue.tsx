@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   DEPOTS,
-  PARTS,
   depotById,
   distinctCategories,
   distinctMarques,
@@ -11,6 +10,7 @@ import {
   totalStock,
 } from "@ge/shared";
 import { useAppStore } from "../store/appStore";
+import { useFirestoreData } from "../store/firestoreData";
 
 export default function Catalogue() {
   const navigate = useNavigate();
@@ -25,10 +25,11 @@ export default function Catalogue() {
   const scan = useAppStore((s) => s.scan);
   const addPart = useAppStore((s) => s.addPart);
 
+  const allParts = useFirestoreData((s) => s.parts);
   const depot = depotById(depotId);
-  const marques = useMemo(() => distinctMarques(PARTS), []);
-  const cats = useMemo(() => distinctCategories(PARTS), []);
-  const parts = useMemo(() => filterParts(PARTS, { q, marque, cat }), [q, marque, cat]);
+  const marques = useMemo(() => distinctMarques(allParts), [allParts]);
+  const cats = useMemo(() => distinctCategories(allParts), [allParts]);
+  const parts = useMemo(() => filterParts(allParts, { q, marque, cat }), [allParts, q, marque, cat]);
 
   return (
     <>

@@ -1,4 +1,5 @@
-import { PURCHASE_ORDERS, SUPPLIERS, formatCFA, type PurchaseOrderEtat } from "@ge/shared";
+import { formatCFA, type PurchaseOrderEtat } from "@ge/shared";
+import { useFirestoreData } from "../store/firestoreData";
 
 const TAG_CLASS: Record<PurchaseOrderEtat, string> = {
   "Réceptionnée": "tag tag-neutral",
@@ -7,6 +8,8 @@ const TAG_CLASS: Record<PurchaseOrderEtat, string> = {
 };
 
 export default function Achats() {
+  const purchaseOrders = useFirestoreData((s) => s.purchaseOrders);
+  const suppliers = useFirestoreData((s) => s.suppliers);
   return (
     <>
       <h1 className="page-title">Achats &amp; fournisseurs</h1>
@@ -14,7 +17,7 @@ export default function Achats() {
       <div className="achats-grid">
         <div>
           <h2 className="section-title">Commandes fournisseurs</h2>
-          {PURCHASE_ORDERS.map((c) => (
+          {purchaseOrders.map((c) => (
             <div className="list-row" key={c.no}>
               <div className="list-row__top">
                 <span className="list-row__name">{c.fournisseur}</span>
@@ -29,7 +32,7 @@ export default function Achats() {
         </div>
         <div>
           <h2 className="section-title">Fournisseurs</h2>
-          {SUPPLIERS.map((f) => (
+          {suppliers.map((f) => (
             <div className="list-row" key={f.nom}>
               <div className="list-row__top">
                 <span className="list-row__name">{f.nom}</span>

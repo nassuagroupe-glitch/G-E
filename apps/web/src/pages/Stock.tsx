@@ -1,6 +1,8 @@
-import { DEPOTS, PARTS, totalStock } from "@ge/shared";
+import { DEPOTS, totalStock } from "@ge/shared";
+import { useFirestoreData } from "../store/firestoreData";
 
 export default function Stock() {
+  const parts = useFirestoreData((s) => s.parts);
   return (
     <>
       <h1 className="page-title">Stock multi-dépôts</h1>
@@ -22,7 +24,7 @@ export default function Stock() {
           </tr>
         </thead>
         <tbody>
-          {PARTS.map((p) => {
+          {parts.map((p) => {
             const total = totalStock(p);
             const bas = total < p.seuil;
             return (

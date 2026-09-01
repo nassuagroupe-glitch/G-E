@@ -10,3 +10,4 @@ apps/desktop/web-dist/
 .DS_Store
 .env
 .env.local
+firebase/seed/serviceAccountKey.json

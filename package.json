@@ -5,14 +5,16 @@
   "description": "G&E — application multiplateforme de vente de pièces détachées, accessoires et consommables auto (catalogue, caisse, facturation, stock multi-dépôts, achats, personnel).",
   "workspaces": [
     "packages/*",
-    "apps/*"
+    "apps/*",
+    "firebase/seed"
   ],
   "scripts": {
     "dev:web": "npm run dev --workspace=@ge/web",
     "build:web": "npm run build --workspace=@ge/web",
     "dev:desktop": "npm run dev --workspace=@ge/desktop",
     "build:desktop": "npm run build --workspace=@ge/desktop",
-    "dev:mobile": "npm run start --workspace=@ge/mobile"
+    "dev:mobile": "npm run start --workspace=@ge/mobile",
+    "firebase:seed": "npm run seed --workspace=@ge/firebase-seed"
   },
   "overrides": {
     "react-native": "0.74.5"

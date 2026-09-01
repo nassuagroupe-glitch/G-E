@@ -1,0 +1,16 @@
+{
+  "name": "@ge/firebase-seed",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "seed": "tsx seed.mjs"
+  },
+  "dependencies": {
+    "@ge/shared": "*",
+    "firebase-admin": "^12.6.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.1"
+  }
+}
