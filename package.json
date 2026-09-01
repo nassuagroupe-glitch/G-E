@@ -14,7 +14,8 @@
     "dev:desktop": "npm run dev --workspace=@ge/desktop",
     "build:desktop": "npm run build --workspace=@ge/desktop",
     "dev:mobile": "npm run start --workspace=@ge/mobile",
-    "firebase:seed": "npm run seed --workspace=@ge/firebase-seed"
+    "firebase:seed": "npm run seed --workspace=@ge/firebase-seed",
+    "firebase:deploy-rules": "npm run deploy-rules --workspace=@ge/firebase-seed"
   },
   "overrides": {
     "react-native": "0.74.5"

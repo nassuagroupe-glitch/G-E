@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "seed": "tsx seed.mjs"
+    "seed": "tsx seed.mjs",
+    "deploy-rules": "tsx deploy-rules.mjs"
   },
   "dependencies": {
     "@ge/shared": "*",
