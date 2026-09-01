@@ -1,51 +1,59 @@
 /*
- * Design tokens ported from the Broadsheet design system
- * (project/_ds/broadsheet-.../styles.css) used by the G&E.dc.html prototype.
- * Only the tokens and component classes the app actually uses are kept —
- * the system's print/CMYK treatments are marketing-page flourishes, not
- * part of the application UI.
+ * Design tokens — restyled to match the ivoirelite.net marketplace look
+ * (bold black/white chrome, rust-orange for product/action highlights,
+ * green for price/stock, red for alerts) instead of the original
+ * Broadsheet editorial theme. Variable names are kept so every page that
+ * already uses var(--color-*) or the .btn/.tag/.input classes picks up
+ * the new palette automatically.
  */
 :root {
-  --color-bg: #f3f2f2;
-  --color-surface: #eae9e9;
-  --color-text: #201e1d;
-  --color-accent: #0088b0;
-  --color-accent-2: #d6006c;
-  --color-divider: color-mix(in srgb, #201e1d 16%, transparent);
+  --color-bg: #ffffff;
+  --color-surface: #f5f5f5;
+  --color-text: #1a1a1a;
+  --color-accent: #c2410c;
+  --color-accent-2: #dc2626;
+  --color-divider: color-mix(in srgb, #1a1a1a 14%, transparent);
 
-  --color-neutral-100: #f8f4f4;
-  --color-neutral-200: #eae7e7;
-  --color-neutral-300: #d7d3d3;
-  --color-neutral-400: #bab6b6;
-  --color-neutral-500: #9b9797;
-  --color-neutral-600: #7d7979;
-  --color-neutral-700: #605d5d;
-  --color-neutral-800: #444141;
-  --color-neutral-900: #2d2b2b;
+  --color-neutral-100: #f7f7f7;
+  --color-neutral-200: #eeeeee;
+  --color-neutral-300: #dddddd;
+  --color-neutral-400: #bbbbbb;
+  --color-neutral-500: #999999;
+  --color-neutral-600: #777777;
+  --color-neutral-700: #555555;
+  --color-neutral-800: #333333;
+  --color-neutral-900: #1a1a1a;
 
-  --color-accent-100: #e9f8ff;
-  --color-accent-200: #cbeeff;
-  --color-accent-300: #99e0ff;
-  --color-accent-400: #62c5ee;
-  --color-accent-500: #38a6cf;
-  --color-accent-600: #1186ac;
-  --color-accent-700: #006786;
-  --color-accent-800: #004961;
-  --color-accent-900: #0a303e;
+  --color-accent-100: #fdece1;
+  --color-accent-200: #fad3b8;
+  --color-accent-300: #f5af7c;
+  --color-accent-400: #ee8547;
+  --color-accent-500: #dc6b28;
+  --color-accent-600: #c2410c;
+  --color-accent-700: #9a3409;
+  --color-accent-800: #7a2a08;
+  --color-accent-900: #5c1f06;
 
-  --color-accent-2-100: #fff1f4;
-  --color-accent-2-200: #ffdee6;
-  --color-accent-2-300: #ffc0d0;
-  --color-accent-2-400: #ff90b1;
-  --color-accent-2-500: #ff458e;
-  --color-accent-2-600: #d82071;
-  --color-accent-2-700: #aa0b56;
-  --color-accent-2-800: #790e3d;
-  --color-accent-2-900: #4b1528;
+  --color-accent-2-100: #fde8e8;
+  --color-accent-2-200: #fbc7c7;
+  --color-accent-2-300: #f79c9c;
+  --color-accent-2-400: #f16d6d;
+  --color-accent-2-500: #e34848;
+  --color-accent-2-600: #dc2626;
+  --color-accent-2-700: #b91c1c;
+  --color-accent-2-800: #8f1616;
+  --color-accent-2-900: #641010;
 
-  --font-heading: "Source Serif 4", system-ui, sans-serif;
-  --font-heading-weight: 600;
-  --font-body: "Source Serif 4", system-ui, sans-serif;
+  /* Success ramp — new for this theme, used for prices / "in stock" /
+     completed states (tag-neutral is remapped to this, see below). */
+  --color-success-100: #eafaf0;
+  --color-success-600: #16a34a;
+  --color-success-700: #15803d;
+  --color-success-800: #14532d;
+
+  --font-heading: "Inter", system-ui, sans-serif;
+  --font-heading-weight: 800;
+  --font-body: "Inter", system-ui, sans-serif;
 
   --space-1: 5px;
   --space-2: 10px;
@@ -58,9 +66,9 @@
   --radius-md: 2px;
   --radius-lg: 4px;
 
-  --shadow-sm: 0 1px 2px color-mix(in srgb, #2d2b2b 14%, transparent);
-  --shadow-md: 0 3px 10px color-mix(in srgb, #2d2b2b 16%, transparent);
-  --shadow-lg: 0 12px 32px color-mix(in srgb, #2d2b2b 22%, transparent);
+  --shadow-sm: 0 1px 2px color-mix(in srgb, #1a1a1a 14%, transparent);
+  --shadow-md: 0 3px 10px color-mix(in srgb, #1a1a1a 16%, transparent);
+  --shadow-lg: 0 12px 32px color-mix(in srgb, #1a1a1a 22%, transparent);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -78,12 +86,12 @@ h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-weight: var(--font-heading-weight);
   line-height: 1.12;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.01em;
   margin: 0 0 var(--space-2);
 }
 
-a { color: var(--color-accent-700); text-decoration: none; }
-a:hover { color: var(--color-accent-2-700); }
+a { color: var(--color-accent); text-decoration: none; }
+a:hover { color: var(--color-accent-700); }
 
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-thumb { background: var(--color-neutral-300); }
@@ -95,20 +103,21 @@ a:hover { color: var(--color-accent-2-700); }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   cursor: pointer; text-decoration: none;
-  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-family: var(--font-heading); font-weight: 700;
   font-size: 14px; line-height: 1.2; color: var(--color-text);
   background: transparent; border: 1px solid transparent;
   padding: var(--space-2) calc(var(--space-3) * 1.2);
   border-radius: var(--radius-md);
 }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { background: var(--color-accent); color: var(--color-bg); }
-.btn-primary:hover { background: var(--color-accent-600); }
-.btn-primary:active { background: var(--color-accent-700); }
+/* Primary CTA — black, matching ivoirelite's "Je veux commander" buttons. */
+.btn-primary { background: var(--color-text); color: #fff; }
+.btn-primary:hover { background: var(--color-neutral-800); }
+.btn-primary:active { background: #000; }
 .btn-secondary { border-color: var(--color-divider); }
 .btn-secondary:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
 .btn-secondary:active { background: color-mix(in srgb, var(--color-text) 14%, transparent); }
-.btn-ghost { color: var(--color-accent-700); padding-inline: var(--space-1); background: transparent; }
+.btn-ghost { color: var(--color-accent); padding-inline: var(--space-1); background: transparent; }
 .btn-ghost:hover { background: var(--color-accent-100); }
 .btn-ghost:active { background: color-mix(in srgb, var(--color-accent) 18%, transparent); }
 .btn-block { width: 100%; margin-top: var(--space-2); }
@@ -129,11 +138,15 @@ a:hover { color: var(--color-accent-2-700); }
   display: inline-flex; align-items: center; font-size: 11px;
   letter-spacing: 0.02em; padding: 3px 10px;
   border-radius: calc(var(--radius-md) * 0.75);
+  font-weight: 700;
 }
 .tag-accent { background: var(--color-accent-100); color: var(--color-accent-800); }
 .tag-accent-2 { background: var(--color-accent-2-100); color: var(--color-accent-2-800); }
-.tag-neutral { background: var(--color-neutral-100); color: var(--color-neutral-800); }
-.tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent-700); }
+/* "neutral" now reads as the theme's success color — every state that used
+   it (Suffisant, Actif, Reçu, Livré, Validé, Réceptionnée) is a completed/
+   good state, matching ivoirelite's green "En stock" convention. */
+.tag-neutral { background: var(--color-success-100); color: var(--color-success-800); }
+.tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent); }
 
 /* — tables — */
 .table { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -149,10 +162,10 @@ a:hover { color: var(--color-accent-2-700); }
 .table tbody tr:hover { background: color-mix(in srgb, var(--color-text) 4%, transparent); }
 
 .pill {
-  font-family: var(--font-body); font-size: 13px; padding: 5px 13px; cursor: pointer;
+  font-family: var(--font-body); font-weight: 700; font-size: 13px; padding: 5px 13px; cursor: pointer;
   border-radius: var(--radius-md); border: 1px solid var(--color-neutral-300);
   background: transparent; color: var(--color-neutral-800);
 }
 .pill-active {
-  border-color: var(--color-accent-700); background: var(--color-accent-700); color: #fff;
+  border-color: var(--color-accent); background: var(--color-accent); color: #fff;
 }

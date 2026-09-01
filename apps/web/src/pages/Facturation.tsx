@@ -83,7 +83,7 @@ export default function Facturation() {
                     {d.client}
                     <div className="small muted">{d.depot}</div>
                   </td>
-                  <td className="num" style={{ textAlign: "right" }}>
+                  <td className="num price" style={{ textAlign: "right" }}>
                     {formatCFA(t.ttc)}
                   </td>
                   <td>
@@ -153,7 +153,7 @@ export default function Facturation() {
               <span>TVA 18 %</span>
               <span style={{ textAlign: "right" }}>{formatCFA(totals.tva)}</span>
               <span className="doc-preview__totals-net">Net à payer</span>
-              <span className="doc-preview__totals-net" style={{ textAlign: "right" }}>
+              <span className="doc-preview__totals-net price" style={{ textAlign: "right" }}>
                 {formatCFA(totals.ttc)}
               </span>
             </div>

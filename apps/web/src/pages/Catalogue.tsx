@@ -9,6 +9,7 @@ import {
   formatCFA,
   totalStock,
 } from "@ge/shared";
+import CategoryIcon from "../components/CategoryIcon";
 import { useAppStore } from "../store/appStore";
 import { useFirestoreData } from "../store/firestoreData";
 
@@ -74,44 +75,33 @@ export default function Catalogue() {
       </div>
       <div className="scan-hint">{scanHint}</div>
 
-      <table className="table">
-        <thead>
-          <tr>
-            <th>Référence</th>
-            <th>Désignation</th>
-            <th>Compatibilité</th>
-            <th style={{ textAlign: "right" }}>Stock total</th>
-            <th style={{ textAlign: "right" }}>P.V. HT</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {parts.map((p) => (
-            <tr key={p.ref}>
-              <td className="num">
-                {p.ref}
-                <div className="small muted">OEM {p.oem}</div>
-              </td>
-              <td style={{ fontWeight: 600 }}>
-                {p.nom}
-                <div className="small muted" style={{ fontWeight: 400 }}>
-                  {p.cat}
-                </div>
-              </td>
-              <td style={{ fontSize: 13 }}>{p.compat}</td>
-              <td className="num" style={{ textAlign: "right" }}>
-                {totalStock(p)}
-                <div className="small muted">
-                  {DEPOTS.map((d) => d.short + " " + p.stock[d.id]).join(" · ")}
-                </div>
-              </td>
-              <td className="num" style={{ textAlign: "right" }}>
-                {formatCFA(p.pv)}
-              </td>
-              <td style={{ textAlign: "right" }}>
+      <div className="product-grid">
+        {parts.map((p) => {
+          const enStock = p.stock[depotId] > 0;
+          return (
+            <div className="product-card" key={p.ref}>
+              <span className="product-card__cat">{p.cat}</span>
+              <div className="product-card__icon">
+                <CategoryIcon category={p.cat} />
+              </div>
+              <div className="product-card__name">{p.nom}</div>
+              <div className="product-card__meta">
+                {p.ref} · OEM {p.oem}
+              </div>
+              <div className="product-card__meta">{p.compat}</div>
+              <div>
+                <span className={enStock ? "tag tag-neutral" : "tag tag-accent-2"}>
+                  {enStock ? `${p.stock[depotId]} en stock — ${depot.name}` : "Rupture ici"}
+                </span>
+              </div>
+              <div className="small muted">
+                Total {totalStock(p)} · {DEPOTS.map((d) => d.short + " " + p.stock[d.id]).join(" · ")}
+              </div>
+              <div className="product-card__footer">
+                <span className="price num product-card__price">{formatCFA(p.pv)}</span>
                 <button
-                  className="btn btn-ghost"
-                  style={{ fontSize: 13, padding: "3px 10px" }}
+                  className="btn btn-primary"
+                  style={{ fontSize: 13, padding: "6px 14px" }}
                   onClick={() => {
                     addPart(p);
                     navigate("/pos");
@@ -119,11 +109,11 @@ export default function Catalogue() {
                 >
                   Vendre
                 </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </>
   );
 }

@@ -49,7 +49,7 @@ export default function Pos() {
                   {p.ref} · {p.stock[depotId]} en rayon
                 </span>
               </span>
-              <span className="num">{formatCFA(p.pv)}</span>
+              <span className="num price">{formatCFA(p.pv)}</span>
             </button>
           ))}
         </div>
@@ -76,7 +76,7 @@ export default function Pos() {
                   +
                 </button>
               </span>
-              <span className="cart-line__total num">{formatCFA(l.pu * l.qte)}</span>
+              <span className="cart-line__total num price">{formatCFA(l.pu * l.qte)}</span>
             </div>
           ))}
 
@@ -86,7 +86,7 @@ export default function Pos() {
             <span className="muted">TVA 18 %</span>
             <span style={{ textAlign: "right" }}>{formatCFA(totals.tva)}</span>
             <span className="totals-grid__net-label">Net à payer</span>
-            <span className="totals-grid__net-value">{formatCFA(totals.ttc)}</span>
+            <span className="totals-grid__net-value price">{formatCFA(totals.ttc)}</span>
           </div>
 
           <div className="payment-row">
