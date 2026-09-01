@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "G&E",
+    "slug": "ge-mobile",
+    "scheme": "ge",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#f3f2f2",
+    "android": {
+      "package": "com.nassuagroupe.ge",
+      "adaptiveIcon": {
+        "backgroundColor": "#f3f2f2"
+      }
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
