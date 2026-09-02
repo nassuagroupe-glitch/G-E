@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useAuth } from "../auth/AuthProvider";
+import loginBackground from "../assets/login-background.jpg";
 
 export default function Login() {
   const { signIn } = useAuth();
@@ -28,6 +29,10 @@ export default function Login() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        backgroundImage: `url(${loginBackground})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
       }}
     >
       <form
