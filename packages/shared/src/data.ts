@@ -86,6 +86,7 @@ export const STAFF: StaffMember[] = [
   { nom: "Mariam Koné", tel: "+225 05 74 10 03", email: "m.kone@ge.ci", role: "Caissière", depot: "Adjamé", droits: "Vente, encaissement, ticket 80 mm", etat: "Actif" },
   { nom: "Yao N'Guessan", tel: "+225 01 42 88 76", email: "y.nguessan@ge.ci", role: "Vendeur comptoir", depot: "Adjamé", droits: "Vente, devis, consultation stock", etat: "Actif" },
   { nom: "Aïcha Traoré", tel: "+225 07 91 30 55", email: "a.traore@ge.ci", role: "Responsable de dépôt", depot: "Yopougon", droits: "Réception, transferts, inventaire", etat: "Actif" },
+  { nom: "Chantal Kouassi", tel: "+225 07 65 20 14", email: "c.kouassi@ge.ci", role: "Caissière", depot: "Yopougon", droits: "Vente, encaissement, ticket 80 mm", etat: "Actif" },
   { nom: "Serge Bamba", tel: "+225 05 12 66 09", email: "s.bamba@ge.ci", role: "Responsable de dépôt", depot: "Bouaké", droits: "Réception, transferts, inventaire", etat: "Actif" },
   { nom: "Fatou Diarra", tel: "+225 01 77 45 18", email: "f.diarra@ge.ci", role: "Comptable", depot: "Tous dépôts", droits: "Facturation, avoirs, encours clients", etat: "Actif" },
   { nom: "Ibrahim Cissé", tel: "+225 07 22 91 40", email: "i.cisse@ge.ci", role: "Vendeur comptoir", depot: "San-Pédro", droits: "Vente, consultation stock", etat: "Suspendu" },
