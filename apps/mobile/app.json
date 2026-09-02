@@ -7,9 +7,14 @@
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "backgroundColor": "#f3f2f2",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "backgroundColor": "#f3f2f2"
+    },
     "android": {
       "package": "com.nassuagroupe.ge",
       "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#f3f2f2"
       }
     },
