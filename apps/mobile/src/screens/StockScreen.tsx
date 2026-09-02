@@ -1,17 +1,19 @@
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { DEPOTS, PARTS, filterParts, formatCFA } from "@ge/shared";
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { DEPOTS, filterParts, formatCFA } from "@ge/shared";
+import { useParts } from "../hooks/useParts";
 import { colors } from "../theme";
 
 export default function StockScreen() {
   const [q, setQ] = useState("");
-  const parts = useMemo(() => filterParts(PARTS, { q }), [q]);
+  const { parts: allParts, loading } = useParts();
+  const parts = useMemo(() => filterParts(allParts, { q }), [allParts, q]);
 
   return (
     <View style={styles.phone}>
       <View style={styles.statusbar}>
-        <Text style={styles.statusbarText}>08:42</Text>
-        <Text style={styles.statusbarText}>Hors-ligne · file 3</Text>
+        <Text style={styles.statusbarText}>Catalogue</Text>
+        <Text style={styles.statusbarText}>{loading ? "Synchronisation…" : `${allParts.length} réf.`}</Text>
       </View>
       <View style={styles.topbar}>
         <TextInput
@@ -22,6 +24,12 @@ export default function StockScreen() {
           onChangeText={setQ}
         />
       </View>
+
+      {loading && allParts.length === 0 && (
+        <View style={styles.loadingBox}>
+          <ActivityIndicator color={colors.accent} />
+        </View>
+      )}
 
       <ScrollView style={styles.body} contentContainerStyle={{ paddingBottom: 20 }}>
         {parts.map((p) => (
@@ -68,6 +76,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   body: { flex: 1, paddingHorizontal: 18, paddingTop: 8 },
+  loadingBox: { paddingVertical: 24, alignItems: "center" },
   row: { paddingVertical: 11, borderBottomWidth: 1, borderBottomColor: colors.divider },
   rowTop: { flexDirection: "row", justifyContent: "space-between", gap: 10 },
   rowName: { fontSize: 14, fontWeight: "700", color: colors.text, flexShrink: 1 },

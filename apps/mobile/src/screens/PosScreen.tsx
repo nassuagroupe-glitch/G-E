@@ -1,41 +1,87 @@
 import { useMemo, useState } from "react";
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import {
-  PARTS,
   addToCart,
-  bumpCartLine,
   cartTotals,
   formatCFA,
   type CartLine,
 } from "@ge/shared";
+import { doc as docRef, runTransaction, serverTimestamp } from "firebase/firestore";
+import { useAuth } from "../auth/AuthProvider";
+import { db } from "../firebase";
+import { useParts } from "../hooks/useParts";
 import { colors, headingFont } from "../theme";
 
+/** This terminal is fixed to the Yopougon depot. */
+const DEPOT_ID = "Y";
+
+function generateTicketNo(): string {
+  const d = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}`;
+  const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
+  return `TK-${stamp}-${rand}`;
+}
+
 export default function PosScreen() {
+  const { user, staff } = useAuth();
+  const { parts, loading } = useParts();
   const [cart, setCart] = useState<CartLine[]>([]);
   const [scanIndex, setScanIndex] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const [ticketNo, setTicketNo] = useState(generateTicketNo);
 
   const totals = useMemo(() => cartTotals(cart), [cart]);
 
   const onScan = () => {
-    const part = PARTS[scanIndex % PARTS.length];
+    if (parts.length === 0) return;
+    const part = parts[scanIndex % parts.length];
     setScanIndex((i) => i + 1);
     setCart((c) => addToCart(c, part));
   };
 
-  const onEncaisser = () => {
+  const onEncaisser = async () => {
     if (cart.length === 0) {
       Alert.alert("Ticket vide", "Scannez ou ajoutez une pièce avant d'encaisser.");
       return;
     }
-    Alert.alert("Encaissé", "Ticket 80 mm envoyé à l'imprimante, stock décrémenté sur Firebase.");
-    setCart([]);
+    setSubmitting(true);
+    try {
+      await runTransaction(db, async (tx) => {
+        const partRefs = cart.map((l) => docRef(db, "parts", l.ref));
+        const snaps = await Promise.all(partRefs.map((r) => tx.get(r)));
+        snaps.forEach((snap, i) => {
+          const line = cart[i];
+          const currentQty = (snap.data()?.stock ?? {})[DEPOT_ID] ?? 0;
+          tx.update(partRefs[i], { [`stock.${DEPOT_ID}`]: currentQty - line.qte });
+        });
+        tx.set(docRef(db, "sales", ticketNo), {
+          no: ticketNo,
+          depotId: DEPOT_ID,
+          cashierUid: user?.uid ?? null,
+          pay: "Espèces",
+          lignes: cart,
+          totalHT: totals.ht,
+          totalTVA: totals.tva,
+          totalTTC: totals.ttc,
+          createdAt: serverTimestamp(),
+        });
+      });
+      setCart([]);
+      setTicketNo(generateTicketNo());
+      Alert.alert("Encaissé", "Ticket 80 mm envoyé à l'imprimante, stock décrémenté sur Firebase.");
+    } catch (e) {
+      Alert.alert("Erreur", "L'encaissement a échoué : " + (e as Error).message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <View style={styles.phone}>
       <View style={styles.statusbar}>
-        <Text style={styles.statusbarText}>08:42</Text>
-        <Text style={styles.statusbarText}>Orange CI · 84 %</Text>
+        <Text style={styles.statusbarText}>{ticketNo}</Text>
+        <Text style={styles.statusbarText}>{staff?.nom ?? "…"}</Text>
       </View>
       <View style={styles.topbar}>
         <Text style={[styles.brand, headingFont]}>G&amp;E</Text>
@@ -43,8 +89,12 @@ export default function PosScreen() {
       </View>
 
       <ScrollView style={styles.body} contentContainerStyle={{ paddingBottom: 16 }}>
-        <TouchableOpacity style={styles.scanBox} onPress={onScan}>
-          <Text style={styles.scanBoxText}>Scanner le code-barres</Text>
+        <TouchableOpacity style={styles.scanBox} onPress={onScan} disabled={loading}>
+          {loading ? (
+            <ActivityIndicator color={colors.accent} />
+          ) : (
+            <Text style={styles.scanBoxText}>Scanner le code-barres</Text>
+          )}
         </TouchableOpacity>
 
         {cart.length === 0 && (
@@ -71,8 +121,16 @@ export default function PosScreen() {
           <Text style={[styles.totalLabel, headingFont]}>Total TTC</Text>
           <Text style={[styles.totalValue, headingFont]}>{formatCFA(totals.ttc)}</Text>
         </View>
-        <TouchableOpacity style={styles.primaryBtn} onPress={onEncaisser}>
-          <Text style={styles.primaryBtnText}>Encaisser</Text>
+        <TouchableOpacity
+          style={[styles.primaryBtn, submitting && styles.primaryBtnDisabled]}
+          onPress={onEncaisser}
+          disabled={submitting}
+        >
+          {submitting ? (
+            <ActivityIndicator color={colors.bg} />
+          ) : (
+            <Text style={styles.primaryBtnText}>Encaisser</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -140,5 +198,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 2,
   },
+  primaryBtnDisabled: { opacity: 0.6 },
   primaryBtnText: { color: colors.bg, fontSize: 15, fontWeight: "700" },
 });

@@ -5,14 +5,17 @@
   "main": "index.js",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
+    "android": "expo run:android",
     "web": "expo start --web",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "ios": "expo run:ios"
   },
   "dependencies": {
     "@ge/shared": "*",
+    "@react-native-async-storage/async-storage": "1.23.1",
     "expo": "~51.0.28",
     "expo-status-bar": "~1.12.1",
+    "firebase": "^12.18.0",
     "react": "18.2.0",
     "react-native": "0.74.5"
   },
