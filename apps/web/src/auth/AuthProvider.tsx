@@ -7,7 +7,10 @@ import {
   type ReactNode,
 } from "react";
 import {
+  browserLocalPersistence,
+  browserSessionPersistence,
   onAuthStateChanged,
+  setPersistence,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   type User,
@@ -22,7 +25,9 @@ interface AuthContextValue {
   loading: boolean;
   /** set once we have a signed-in user but no matching staff/{uid} doc. */
   missingStaffDoc: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
+  /** `remember` picks the session's persistence: kept across browser
+   * restarts (true) or cleared when the tab/browser closes (false). */
+  signIn: (email: string, password: string, remember: boolean) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -57,7 +62,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     staff,
     loading: !authResolved || (!!user && !staffResolved),
     missingStaffDoc: !!user && staffResolved && !staff,
-    signIn: async (email, password) => {
+    signIn: async (email, password, remember) => {
+      await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
       await signInWithEmailAndPassword(auth, email, password);
     },
     signOut: () => firebaseSignOut(auth),

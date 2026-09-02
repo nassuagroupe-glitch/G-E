@@ -6,6 +6,7 @@ export default function Login() {
   const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(true);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -14,7 +15,7 @@ export default function Login() {
     setError("");
     setBusy(true);
     try {
-      await signIn(email, password);
+      await signIn(email, password, remember);
     } catch {
       setError("Adresse e-mail ou mot de passe incorrect.");
     } finally {
@@ -82,6 +83,24 @@ export default function Login() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            marginBottom: 20,
+            fontSize: 13,
+            cursor: "pointer",
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={remember}
+            onChange={(e) => setRemember(e.target.checked)}
+          />
+          Se souvenir de moi
+        </label>
 
         <button className="btn btn-primary btn-block" type="submit" disabled={busy}>
           {busy ? "Connexion…" : "Se connecter"}
