@@ -1,21 +1,41 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "../auth/AuthProvider";
 import loginBackground from "../assets/login-background.jpg";
+
+const SAVED_CREDENTIALS_KEY = "ge_saved_credentials";
 
 export default function Login() {
   const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(true);
+  const [remember, setRemember] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(SAVED_CREDENTIALS_KEY);
+    if (!saved) return;
+    try {
+      const { email: savedEmail, password: savedPassword } = JSON.parse(saved);
+      setEmail(savedEmail ?? "");
+      setPassword(savedPassword ?? "");
+      setRemember(true);
+    } catch {
+      localStorage.removeItem(SAVED_CREDENTIALS_KEY);
+    }
+  }, []);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError("");
     setBusy(true);
     try {
-      await signIn(email, password, remember);
+      await signIn(email, password);
+      if (remember) {
+        localStorage.setItem(SAVED_CREDENTIALS_KEY, JSON.stringify({ email, password }));
+      } else {
+        localStorage.removeItem(SAVED_CREDENTIALS_KEY);
+      }
     } catch {
       setError("Adresse e-mail ou mot de passe incorrect.");
     } finally {
@@ -99,7 +119,7 @@ export default function Login() {
             checked={remember}
             onChange={(e) => setRemember(e.target.checked)}
           />
-          Se souvenir de moi
+          Se souvenir du mot de passe
         </label>
 
         <button className="btn btn-primary btn-block" type="submit" disabled={busy}>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -9,22 +9,44 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAuth } from "../auth/AuthProvider";
 import { colors, headingFont } from "../theme";
+
+const SAVED_CREDENTIALS_KEY = "@ge/savedCredentials";
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [remember, setRemember] = useState(true);
+  const [remember, setRemember] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    AsyncStorage.getItem(SAVED_CREDENTIALS_KEY).then((saved) => {
+      if (!saved) return;
+      try {
+        const { email: savedEmail, password: savedPassword } = JSON.parse(saved);
+        setEmail(savedEmail ?? "");
+        setPassword(savedPassword ?? "");
+        setRemember(true);
+      } catch {
+        AsyncStorage.removeItem(SAVED_CREDENTIALS_KEY);
+      }
+    });
+  }, []);
 
   const onSubmit = async () => {
     setError("");
     setSubmitting(true);
     try {
-      await signIn(email.trim(), password, remember);
+      await signIn(email.trim(), password);
+      if (remember) {
+        await AsyncStorage.setItem(SAVED_CREDENTIALS_KEY, JSON.stringify({ email, password }));
+      } else {
+        await AsyncStorage.removeItem(SAVED_CREDENTIALS_KEY);
+      }
     } catch (e) {
       console.error("Sign-in failed:", e);
       setError("Connexion impossible — vérifiez l'e-mail et le mot de passe.");
@@ -68,7 +90,7 @@ export default function LoginScreen() {
           <View style={[styles.checkbox, remember && styles.checkboxChecked]}>
             {remember && <Text style={styles.checkboxMark}>✓</Text>}
           </View>
-          <Text style={styles.rememberLabel}>Se souvenir de moi</Text>
+          <Text style={styles.rememberLabel}>Se souvenir du mot de passe</Text>
         </TouchableOpacity>
 
         {!!error && <Text style={styles.error}>{error}</Text>}

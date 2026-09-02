@@ -7,7 +7,6 @@ import {
   type ReactNode,
 } from "react";
 import {
-  browserLocalPersistence,
   browserSessionPersistence,
   onAuthStateChanged,
   setPersistence,
@@ -25,9 +24,7 @@ interface AuthContextValue {
   loading: boolean;
   /** set once we have a signed-in user but no matching staff/{uid} doc. */
   missingStaffDoc: boolean;
-  /** `remember` picks the session's persistence: kept across browser
-   * restarts (true) or cleared when the tab/browser closes (false). */
-  signIn: (email: string, password: string, remember: boolean) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -39,14 +36,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [authResolved, setAuthResolved] = useState(false);
   const [staffResolved, setStaffResolved] = useState(false);
 
-  useEffect(() => onAuthStateChanged(auth, (u) => {
-    setUser(u);
-    setAuthResolved(true);
-    if (!u) {
-      setStaff(null);
-      setStaffResolved(true);
-    }
-  }), []);
+  // Auth persistence is session-only and a login is mandatory on every
+  // launch (each cashier signs in fresh — the cashierUid on a sale must
+  // match whoever is actually at the till), so any session restored from a
+  // previous persistence mode is deliberately dropped before subscribing.
+  useEffect(() => {
+    let unsub: (() => void) | undefined;
+    let cancelled = false;
+    (async () => {
+      await setPersistence(auth, browserSessionPersistence);
+      await firebaseSignOut(auth);
+      if (cancelled) return;
+      unsub = onAuthStateChanged(auth, (u) => {
+        setUser(u);
+        setAuthResolved(true);
+        if (!u) {
+          setStaff(null);
+          setStaffResolved(true);
+        }
+      });
+    })();
+    return () => {
+      cancelled = true;
+      unsub?.();
+    };
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -62,8 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     staff,
     loading: !authResolved || (!!user && !staffResolved),
     missingStaffDoc: !!user && staffResolved && !staff,
-    signIn: async (email, password, remember) => {
-      await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+    signIn: async (email, password) => {
       await signInWithEmailAndPassword(auth, email, password);
     },
     signOut: () => firebaseSignOut(auth),
