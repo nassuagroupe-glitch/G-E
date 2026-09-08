@@ -18,6 +18,8 @@
   "build": {
     "appId": "com.nassuagroupe.ge",
     "productName": "G&E",
+    "electronVersion": "32.3.3",
+    "npmRebuild": false,
     "directories": {
       "output": "release"
     },

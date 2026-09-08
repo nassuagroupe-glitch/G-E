@@ -1,12 +1,29 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "../auth/AuthProvider";
+import loginBackground from "../assets/login-background.jpg";
+
+const SAVED_CREDENTIALS_KEY = "ge_saved_credentials";
 
 export default function Login() {
   const { signIn } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [remember, setRemember] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(SAVED_CREDENTIALS_KEY);
+    if (!saved) return;
+    try {
+      const { email: savedEmail, password: savedPassword } = JSON.parse(saved);
+      setEmail(savedEmail ?? "");
+      setPassword(savedPassword ?? "");
+      setRemember(true);
+    } catch {
+      localStorage.removeItem(SAVED_CREDENTIALS_KEY);
+    }
+  }, []);
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -14,6 +31,11 @@ export default function Login() {
     setBusy(true);
     try {
       await signIn(email, password);
+      if (remember) {
+        localStorage.setItem(SAVED_CREDENTIALS_KEY, JSON.stringify({ email, password }));
+      } else {
+        localStorage.removeItem(SAVED_CREDENTIALS_KEY);
+      }
     } catch {
       setError("Adresse e-mail ou mot de passe incorrect.");
     } finally {
@@ -28,6 +50,10 @@ export default function Login() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        backgroundImage: `url(${loginBackground})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
       }}
     >
       <form
@@ -77,6 +103,24 @@ export default function Login() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            marginBottom: 20,
+            fontSize: 13,
+            cursor: "pointer",
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={remember}
+            onChange={(e) => setRemember(e.target.checked)}
+          />
+          Se souvenir du mot de passe
+        </label>
 
         <button className="btn btn-primary btn-block" type="submit" disabled={busy}>
           {busy ? "Connexion…" : "Se connecter"}

@@ -7,9 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import {
-  browserSessionPersistence,
   onAuthStateChanged,
-  setPersistence,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   type User,
@@ -36,15 +34,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [authResolved, setAuthResolved] = useState(false);
   const [staffResolved, setStaffResolved] = useState(false);
 
-  // Auth persistence is session-only and a login is mandatory on every
-  // launch (each cashier signs in fresh — the cashierUid on a sale must
-  // match whoever is actually at the till), so any session restored from a
-  // previous persistence mode is deliberately dropped before subscribing.
+  // AsyncStorage-backed auth persistence is always on for RN Firebase, but a
+  // login is mandatory on every app launch (each cashier signs in fresh —
+  // the cashierUid on a sale must match whoever is actually at the till),
+  // so any restored session is dropped before it ever reaches the UI.
   useEffect(() => {
     let unsub: (() => void) | undefined;
     let cancelled = false;
     (async () => {
-      await setPersistence(auth, browserSessionPersistence);
       await firebaseSignOut(auth);
       if (cancelled) return;
       unsub = onAuthStateChanged(auth, (u) => {
