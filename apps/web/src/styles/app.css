@@ -1,15 +1,17 @@
 /* Layout shared by every screen — a marketplace-style chrome (utility bar,
-   logo + search + cart, horizontal nav) instead of the original sidebar,
-   after the ivoirelite.net reference. */
+   logo + search + cart, horizontal nav) on top of a Müller-Brockmann grid:
+   a 12-column page grid (--grid-columns/--gutter/--margin) and an 8px
+   baseline unit (--baseline) drive every spacing value below instead of
+   values picked by eye — see tokens.css for the variables themselves. */
 
 .app-topbar {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: var(--gutter);
   background: var(--color-text);
   color: #fff;
-  font-size: 13px;
-  padding: 7px 40px;
+  font-size: var(--text-xs);
+  padding: var(--baseline) var(--margin);
 }
 .app-topbar__spacer { flex: 1; }
 .app-topbar a, .app-topbar button {
@@ -25,8 +27,8 @@
 .app-header {
   display: flex;
   align-items: center;
-  gap: 24px;
-  padding: 16px 40px;
+  gap: var(--gutter);
+  padding: calc(var(--baseline) * 2) var(--margin);
   flex-wrap: wrap;
 }
 .app-logo {
@@ -35,51 +37,51 @@
   overflow: hidden;
   font-family: var(--font-heading);
   font-weight: 800;
-  font-size: 22px;
+  font-size: var(--text-md);
   letter-spacing: -0.02em;
   flex: none;
 }
-.app-logo__dark { background: var(--color-text); color: #fff; padding: 8px 8px 8px 18px; }
-.app-logo__light { background: var(--color-accent-200); color: var(--color-text); padding: 8px 18px 8px 8px; }
+.app-logo__dark { background: var(--color-text); color: #fff; padding: var(--baseline) var(--baseline) var(--baseline) calc(var(--baseline) * 2.25); }
+.app-logo__light { background: var(--color-accent-200); color: var(--color-text); padding: var(--baseline) calc(var(--baseline) * 2.25) var(--baseline) var(--baseline); }
 
 .app-search { display: flex; flex: 1; min-width: 220px; max-width: 480px; }
 .app-search input {
   flex: 1; border: 1px solid var(--color-neutral-300); border-right: 0;
   border-radius: var(--radius-md) 0 0 var(--radius-md);
-  padding: 9px 12px; font: inherit; font-size: 14px; background: var(--color-surface);
+  padding: var(--baseline) calc(var(--baseline) * 1.5); font: inherit; font-size: var(--text-xs); background: var(--color-surface);
 }
 .app-search button {
   border: 1px solid var(--color-text); background: var(--color-text); color: #fff;
-  border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 0 16px; cursor: pointer;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 0 var(--gutter); cursor: pointer;
 }
 
 .app-header__spacer { flex: 1; }
 .app-header__depot {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--baseline);
 }
 .app-header__depot-label {
-  font-size: 11px;
+  font-size: var(--text-xs);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--color-neutral-600);
 }
 .app-header__depot select {
   min-width: 170px;
-  font-size: 13px;
-  padding: 4px 8px;
+  font-size: var(--text-xs);
+  padding: 4px var(--baseline);
 }
 
 .app-cart-badge {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--baseline);
   border: 1px solid var(--color-neutral-300);
   border-radius: var(--radius-md);
-  padding: 8px 14px;
+  padding: var(--baseline) calc(var(--baseline) * 2);
   font-weight: 700;
-  font-size: 13px;
+  font-size: var(--text-xs);
   color: var(--color-text);
   cursor: pointer;
   background: var(--color-surface);
@@ -94,20 +96,22 @@
 .app-navbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 26px;
-  padding: 0 40px;
+  gap: var(--gutter);
+  padding: 0 var(--margin);
   border-top: 1px solid var(--color-divider);
   border-bottom: 2px solid var(--color-text);
 }
+/* The accent's one job in navigation: mark the active section — nowhere
+   else in the nav does color carry meaning. */
 .app-nav__link {
   display: inline-block;
   background: none;
   border: 0;
   border-bottom: 3px solid transparent;
-  padding: 13px 0;
+  padding: calc(var(--baseline) * 2) 0;
   cursor: pointer;
   font-family: var(--font-heading);
-  font-size: 12.5px;
+  font-size: var(--text-xs);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--color-text);
@@ -116,76 +120,105 @@
 .app-nav__link:hover { color: var(--color-accent); }
 .app-nav__link--active { color: var(--color-accent); border-bottom-color: var(--color-accent); }
 
+/* Page grid — every screen's content lives here. Direct children span the
+   full 12 columns by default; a two-column section opts into its own
+   nested 12-column split (see .dash-grid etc. below) instead of picking
+   an arbitrary fr-ratio. */
 .app-main {
-  padding: 28px 40px 80px;
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), 1fr);
+  column-gap: var(--gutter);
+  padding: calc(var(--baseline) * 4) var(--margin) calc(var(--baseline) * 10);
   max-width: 1320px;
   margin: 0 auto;
 }
+.app-main > * { grid-column: 1 / -1; }
 
-.price { color: var(--color-success-700); font-weight: 800; }
+/* One shared two-column split (7 of 12 / 5 of 12 — a ~1.4 ratio) reused by
+   every section that used to invent its own fr proportions. */
+.grid-split-7-5 {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), 1fr);
+  column-gap: var(--gutter);
+  align-items: start;
+}
+.grid-split-7-5 > :first-child { grid-column: span 7; }
+.grid-split-7-5 > :last-child { grid-column: span 5; }
+.grid-split-6-6 {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns), 1fr);
+  column-gap: var(--gutter);
+  align-items: start;
+}
+.grid-split-6-6 > * { grid-column: span 6; }
 
-.page-title { font-size: 40px; margin: 0 0 4px; letter-spacing: -0.02em; }
-.page-subtitle { margin: 0 0 26px; color: var(--color-neutral-600); font-size: 15px; }
+.price { color: var(--color-text); font-weight: 800; }
+
+.page-title { font-size: var(--text-xl); margin: 0 0 var(--baseline); letter-spacing: -0.02em; }
+.page-subtitle { margin: 0 0 calc(var(--baseline) * 4); color: var(--color-neutral-600); font-size: var(--text-sm); }
 .section-title {
-  font-size: 13px;
+  font-size: var(--text-xs);
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  margin: 0 0 14px;
+  margin: 0 0 calc(var(--baseline) * 2);
   color: var(--color-neutral-700);
 }
 .field-label {
   display: block;
-  font-size: 11px;
+  font-size: var(--text-xs);
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--color-neutral-600);
-  margin-bottom: 5px;
+  margin-bottom: var(--baseline);
 }
 .num { font-variant-numeric: tabular-nums; }
 .muted { color: var(--color-neutral-600); }
-.small { font-size: 12px; }
+.small { font-size: var(--text-xs); }
 
 /* — Dashboard — */
-.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 34px; margin-bottom: 48px; }
-.kpi-label { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: 8px; }
-.kpi-value { font-family: var(--font-heading); font-size: 34px; font-weight: 600; letter-spacing: -0.02em; line-height: 1; }
-.kpi-note { font-size: 13px; color: var(--color-neutral-600); margin-top: 6px; }
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--gutter); margin-bottom: calc(var(--baseline) * 6); }
+.kpi-label { font-size: var(--text-xs); letter-spacing: 0.16em; text-transform: uppercase; color: var(--color-neutral-600); margin-bottom: var(--baseline); }
+.kpi-value { font-family: var(--font-heading); font-size: var(--text-lg); font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+.kpi-note { font-size: var(--text-xs); color: var(--color-neutral-600); margin-top: var(--baseline); }
 
-.dash-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 56px; }
 .depot-row {
-  display: grid; grid-template-columns: 150px 1fr 110px; align-items: center; gap: 14px;
-  padding: 9px 0; border-bottom: 1px solid var(--color-divider);
+  display: grid; grid-template-columns: 150px 1fr 110px; align-items: center; gap: calc(var(--baseline) * 2);
+  padding: var(--baseline) 0; border-bottom: 1px solid var(--color-divider);
 }
 .depot-row__name { font-weight: 600; }
 .depot-row__bar { height: 9px; background: var(--color-neutral-200); display: block; }
+/* The dashboard's one data series — the accent used exactly as dataviz
+   recommends: a single color against neutral gray, no palette to manage. */
 .depot-row__bar-fill { display: block; height: 9px; background: var(--color-accent); }
 .depot-row__ca { text-align: right; }
 
-.alert-row { padding: 9px 0; border-bottom: 1px solid var(--color-divider); }
-.alert-row__top { display: flex; justify-content: space-between; gap: 12px; }
+.alert-row { padding: var(--baseline) 0; border-bottom: 1px solid var(--color-divider); }
+.alert-row__top { display: flex; justify-content: space-between; gap: calc(var(--baseline) * 1.5); }
 .alert-row__name { font-weight: 600; }
-.alert-row__meta { font-size: 13px; color: var(--color-neutral-600); }
+.alert-row__meta { font-size: var(--text-xs); color: var(--color-neutral-600); }
 
 /* — Catalogue / recherche — */
-.filters-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; margin-bottom: 8px; }
+.filters-row { display: flex; flex-wrap: wrap; gap: calc(var(--baseline) * 2); align-items: flex-end; margin-bottom: var(--baseline); }
 .filters-row__search { flex: 1; min-width: 260px; }
-.scan-hint { font-size: 13px; color: var(--color-neutral-600); margin-bottom: 18px; }
+.scan-hint { font-size: var(--text-xs); color: var(--color-neutral-600); margin-bottom: calc(var(--baseline) * 2); }
 
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
+  gap: var(--gutter);
 }
 .product-card {
   border: 1px solid var(--color-neutral-200);
   border-radius: var(--radius-lg);
-  padding: 16px;
+  padding: calc(var(--baseline) * 2);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--baseline);
   background: #fff;
 }
 .product-card:hover { border-color: var(--color-accent); box-shadow: var(--shadow-sm); }
+/* Neutral, not accent — with a card per category on screen at once, tinting
+   every icon would turn the "one precise accent" into ambient color. */
 .product-card__icon {
   width: 100%;
   aspect-ratio: 1.4;
@@ -194,120 +227,103 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-accent);
+  color: var(--color-neutral-700);
 }
 .product-card__cat {
   align-self: flex-start;
-  font-size: 10px;
+  font-size: var(--text-xs);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #fff;
   background: var(--color-text);
-  padding: 2px 8px;
+  padding: 2px var(--baseline);
   border-radius: var(--radius-sm);
 }
+/* The product name is the one place per card that reads as "the primary
+   clickable thing" — same role as a nav's active state or a link. */
 .product-card__name {
   font-weight: 700;
   color: var(--color-accent);
-  font-size: 14px;
+  font-size: var(--text-sm);
   line-height: 1.3;
 }
-.product-card__meta { font-size: 12px; color: var(--color-neutral-600); }
-.product-card__price { font-size: 17px; margin-top: auto; }
-.product-card__footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.product-card__meta { font-size: var(--text-xs); color: var(--color-neutral-600); }
+.product-card__price { font-size: var(--text-md); margin-top: auto; }
+.product-card__footer { display: flex; align-items: center; justify-content: space-between; gap: var(--baseline); }
 
 /* — POS — */
-.pos-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 48px; align-items: start; }
-.pos-search { margin-bottom: 16px; font-size: 16px; }
+.pos-search { margin-bottom: var(--baseline); font-size: var(--text-sm); }
 .pos-part-btn {
-  display: grid; grid-template-columns: 1fr auto; gap: 10px; width: 100%; text-align: left;
-  background: none; border: 0; border-bottom: 1px solid var(--color-divider); padding: 11px 2px;
-  font-family: var(--font-body); font-size: 15px; color: var(--color-text); cursor: pointer;
+  display: grid; grid-template-columns: 1fr auto; gap: var(--baseline); width: 100%; text-align: left;
+  background: none; border: 0; border-bottom: 1px solid var(--color-divider); padding: var(--baseline) 0;
+  font-family: var(--font-body); font-size: var(--text-sm); color: var(--color-text); cursor: pointer;
 }
 .pos-part-btn:hover { background: var(--color-accent-100); }
 .pos-part-btn__name { font-weight: 600; }
-.pos-part-btn__meta { display: block; font-size: 12px; color: var(--color-neutral-600); }
+.pos-part-btn__meta { display: block; font-size: var(--text-xs); color: var(--color-neutral-600); }
 
-.cart-empty { color: var(--color-neutral-600); font-style: italic; margin: 0 0 20px; }
-.cart-line { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--color-divider); }
+.cart-empty { color: var(--color-neutral-600); font-style: italic; margin: 0 0 calc(var(--baseline) * 3); }
+.cart-line { display: grid; grid-template-columns: 1fr auto auto; gap: var(--baseline); align-items: center; padding: var(--baseline) 0; border-bottom: 1px solid var(--color-divider); }
 .cart-line__name { font-weight: 600; }
-.cart-line__meta { display: block; font-size: 12px; color: var(--color-neutral-600); }
-.cart-line__qty { display: flex; align-items: center; gap: 6px; }
-.cart-line__qty-btn { padding: 0 8px; font-size: 15px; }
+.cart-line__meta { display: block; font-size: var(--text-xs); color: var(--color-neutral-600); }
+.cart-line__qty { display: flex; align-items: center; gap: var(--baseline); }
+.cart-line__qty-btn { padding: 0 var(--baseline); font-size: var(--text-sm); }
 .cart-line__qty-val { min-width: 20px; text-align: center; }
 .cart-line__total { min-width: 92px; text-align: right; }
 
-.totals-grid { margin-top: 18px; display: grid; grid-template-columns: 1fr auto; gap: 6px 10px; }
-.totals-grid__net-label { font-family: var(--font-heading); font-size: 24px; font-weight: 600; padding-top: 6px; }
-.totals-grid__net-value { text-align: right; font-family: var(--font-heading); font-size: 24px; font-weight: 600; padding-top: 6px; }
+.totals-grid { margin-top: calc(var(--baseline) * 2); display: grid; grid-template-columns: 1fr auto; gap: var(--baseline) var(--baseline); }
+.totals-grid__net-label { font-family: var(--font-heading); font-size: var(--text-md); font-weight: 700; padding-top: var(--baseline); }
+.totals-grid__net-value { text-align: right; font-family: var(--font-heading); font-size: var(--text-md); font-weight: 700; padding-top: var(--baseline); }
 
-.payment-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
-.action-row { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
-.flash-msg { font-size: 13px; color: var(--color-accent-2-700); margin-top: 10px; min-height: 18px; }
+.payment-row { display: flex; flex-wrap: wrap; gap: var(--baseline); margin-top: calc(var(--baseline) * 3); }
+.action-row { display: flex; gap: var(--baseline); margin-top: calc(var(--baseline) * 2); flex-wrap: wrap; }
+/* No color signal left here — a status message reads through weight alone. */
+.flash-msg { font-size: var(--text-xs); font-weight: 700; color: var(--color-text); margin-top: var(--baseline); min-height: 18px; }
 
 /* — Facturation — */
-.tabs-row { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-.fact-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 48px; align-items: start; }
+.tabs-row { display: flex; gap: var(--baseline); margin-bottom: calc(var(--baseline) * 2); flex-wrap: wrap; }
 .doc-row { cursor: pointer; }
+/* Deliberately denser than the page baseline: this simulates a printed
+   invoice, where tight line-spacing is the point, not an oversight. */
 .doc-preview {
-  background: #fff; box-shadow: var(--shadow-md); padding: 26px 24px;
+  background: #fff; box-shadow: var(--shadow-md); padding: calc(var(--baseline) * 3);
 }
 .doc-preview__head {
   display: flex; justify-content: space-between; align-items: baseline;
-  border-bottom: 2px solid var(--color-text); padding-bottom: 8px;
+  border-bottom: 2px solid var(--color-text); padding-bottom: var(--baseline);
 }
-.doc-preview__brand { font-family: var(--font-heading); font-size: 22px; font-weight: 700; }
-.doc-preview__legal { font-size: 12px; text-align: right; color: var(--color-neutral-700); }
-.doc-preview__meta { display: flex; justify-content: space-between; margin: 16px 0 14px; font-size: 13px; }
+.doc-preview__brand { font-family: var(--font-heading); font-size: var(--text-md); font-weight: 700; }
+.doc-preview__legal { font-size: var(--text-xs); text-align: right; color: var(--color-neutral-700); }
+.doc-preview__meta { display: flex; justify-content: space-between; margin: calc(var(--baseline) * 2) 0; font-size: var(--text-xs); }
 .doc-preview__meta-right { text-align: right; }
-.doc-preview table { width: 100%; font-size: 13px; border-collapse: collapse; }
+.doc-preview table { width: 100%; font-size: var(--text-xs); border-collapse: collapse; }
 .doc-preview thead tr { border-bottom: 1px solid var(--color-divider); }
 .doc-preview th { text-align: left; padding: 4px 0; font-weight: 600; }
 .doc-preview th:not(:first-child) { text-align: right; }
 .doc-preview tbody tr { border-bottom: 1px solid var(--color-neutral-200); }
 .doc-preview td { padding: 5px 0; }
 .doc-preview td:not(:first-child) { text-align: right; }
-.doc-preview__totals { display: grid; grid-template-columns: 1fr auto; gap: 3px 12px; font-size: 13px; margin-top: 12px; }
-.doc-preview__totals-net { font-weight: 700; font-size: 16px; }
-.doc-preview__lettres { font-size: 11px; color: var(--color-neutral-600); margin-top: 14px; }
+.doc-preview__totals { display: grid; grid-template-columns: 1fr auto; gap: 3px var(--baseline); font-size: var(--text-xs); margin-top: calc(var(--baseline) * 2); }
+.doc-preview__totals-net { font-weight: 700; font-size: var(--text-sm); }
+.doc-preview__lettres { font-size: var(--text-xs); color: var(--color-neutral-600); margin-top: calc(var(--baseline) * 2); }
 
 /* — Stock — */
-.stock-cell--empty { color: var(--color-accent-2-700); }
+/* Weight, not color, flags an empty depot column. */
+.stock-cell--empty { font-weight: 800; color: var(--color-text); }
 
 /* — Transferts — */
 .transfer-row {
-  display: grid; grid-template-columns: 130px 1fr 200px 150px; gap: 20px; align-items: center;
-  padding: 16px 0; border-bottom: 1px solid var(--color-divider);
+  display: grid; grid-template-columns: 130px 1fr 200px 150px; gap: var(--gutter); align-items: center;
+  padding: calc(var(--baseline) * 2) 0; border-bottom: 1px solid var(--color-divider);
 }
 .transfer-row__route { font-weight: 600; }
-.transfer-row__detail { font-size: 13px; color: var(--color-neutral-600); }
-.transfer-row__status { font-size: 13px; color: var(--color-neutral-600); }
+.transfer-row__detail { font-size: var(--text-xs); color: var(--color-neutral-600); }
+.transfer-row__status { font-size: var(--text-xs); color: var(--color-neutral-600); }
 .transfer-row__action { text-align: right; }
 
 /* — Achats — */
-.achats-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 56px; align-items: start; }
-.list-row { padding: 12px 0; border-bottom: 1px solid var(--color-divider); }
-.list-row__top { display: flex; justify-content: space-between; gap: 12px; }
+.list-row { padding: calc(var(--baseline) * 2) 0; border-bottom: 1px solid var(--color-divider); }
+.list-row__top { display: flex; justify-content: space-between; gap: calc(var(--baseline) * 1.5); }
 .list-row__name { font-weight: 600; }
-.list-row__meta { font-size: 13px; color: var(--color-neutral-600); }
-
-/* — Mobile preview (Android mockups) — */
-.mobile-preview-row { display: flex; gap: 56px; justify-content: center; padding: 44px 40px 80px; flex-wrap: wrap; }
-.phone {
-  width: 340px; height: 700px; background: #fff; box-shadow: var(--shadow-lg); border-radius: 22px;
-  overflow: hidden; display: flex; flex-direction: column;
-}
-.phone__statusbar { display: flex; justify-content: space-between; padding: 9px 16px 4px; font-size: 12px; color: var(--color-neutral-700); }
-.phone__topbar {
-  padding: 6px 18px 12px; border-bottom: 2px solid var(--color-text);
-  display: flex; justify-content: space-between; align-items: baseline;
-}
-.phone__brand { font-family: var(--font-heading); font-size: 22px; font-weight: 700; }
-.phone__body { padding: 16px 18px; flex: 1; overflow: auto; }
-.phone__scan {
-  border: 1px dashed var(--color-accent); padding: 22px 12px; text-align: center;
-  color: var(--color-accent-700); font-size: 14px; margin-bottom: 18px;
-}
-.phone__footer { padding: 14px 18px 20px; border-top: 1px solid var(--color-divider); }
-.phone__total { display: flex; justify-content: space-between; font-family: var(--font-heading); font-size: 21px; font-weight: 600; margin-bottom: 10px; }
+.list-row__meta { font-size: var(--text-xs); color: var(--color-neutral-600); }

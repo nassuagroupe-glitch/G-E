@@ -1,17 +1,20 @@
 /*
- * Design tokens — restyled to match the ivoirelite.net marketplace look
- * (bold black/white chrome, rust-orange for product/action highlights,
- * green for price/stock, red for alerts) instead of the original
- * Broadsheet editorial theme. Variable names are kept so every page that
- * already uses var(--color-*) or the .btn/.tag/.input classes picks up
- * the new palette automatically.
+ * Design tokens — Swiss Style / Müller-Brockmann discipline applied on top
+ * of the ivoirelite.net-inspired chrome: ONE accent color (orange, reserved
+ * for a single precise role — "this is active, selected, or the primary
+ * interactive thing": nav active state, links, product-card names, focus
+ * rings, the dashboard's one data bar, tab/payment selection). Every other
+ * semantic state (alerts, completed, pending) is expressed with black/white/
+ * gray weight and borders instead of a second or third hue. A 12-column
+ * grid + an 8px baseline unit + a fixed type scale replace the ad hoc
+ * pixel values the marketplace pass left behind — see app.css for how
+ * pages consume --grid-columns/--gutter/--margin/--baseline.
  */
 :root {
   --color-bg: #ffffff;
   --color-surface: #f5f5f5;
   --color-text: #1a1a1a;
   --color-accent: #c2410c;
-  --color-accent-2: #dc2626;
   --color-divider: color-mix(in srgb, #1a1a1a 14%, transparent);
 
   --color-neutral-100: #f7f7f7;
@@ -24,6 +27,8 @@
   --color-neutral-800: #333333;
   --color-neutral-900: #1a1a1a;
 
+  /* Tints/shades of the one accent hue — used only for interactive
+     feedback (hover, focus, selection), never as a second signal color. */
   --color-accent-100: #fdece1;
   --color-accent-200: #fad3b8;
   --color-accent-300: #f5af7c;
@@ -34,26 +39,31 @@
   --color-accent-800: #7a2a08;
   --color-accent-900: #5c1f06;
 
-  --color-accent-2-100: #fde8e8;
-  --color-accent-2-200: #fbc7c7;
-  --color-accent-2-300: #f79c9c;
-  --color-accent-2-400: #f16d6d;
-  --color-accent-2-500: #e34848;
-  --color-accent-2-600: #dc2626;
-  --color-accent-2-700: #b91c1c;
-  --color-accent-2-800: #8f1616;
-  --color-accent-2-900: #641010;
-
-  /* Success ramp — new for this theme, used for prices / "in stock" /
-     completed states (tag-neutral is remapped to this, see below). */
-  --color-success-100: #eafaf0;
-  --color-success-600: #16a34a;
-  --color-success-700: #15803d;
-  --color-success-800: #14532d;
-
   --font-heading: "Inter", system-ui, sans-serif;
   --font-heading-weight: 800;
   --font-body: "Inter", system-ui, sans-serif;
+
+  /* Type scale — ratio ~1.33 from a 16px base (Müller-Brockmann grid
+     systems skill). Every heading/label size in app.css picks one of
+     these instead of an arbitrary value. */
+  --text-xs: 12px;
+  --text-sm: 16px;
+  --text-md: 21px;
+  --text-lg: 28px;
+  --text-xl: 38px;
+  --text-2xl: 50px;
+  --text-3xl: 67px;
+
+  /* Baseline grid — the vertical rhythm unit. Spacing in app.css is a
+     multiple of this, not a value chosen by eye. */
+  --baseline: 8px;
+
+  /* Page grid — 12 columns, a fixed gutter, and the live-area margin.
+     app-main and every multi-column section share these instead of
+     inventing their own fr-ratios. */
+  --grid-columns: 12;
+  --gutter: 24px;
+  --margin: 40px;
 
   --space-1: 5px;
   --space-2: 10px;
@@ -78,8 +88,8 @@ body {
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-body);
-  font-size: 15px;
-  line-height: 1.55;
+  font-size: var(--text-sm);
+  line-height: 1.5;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -87,7 +97,7 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: var(--font-heading-weight);
   line-height: 1.12;
   letter-spacing: -0.01em;
-  margin: 0 0 var(--space-2);
+  margin: 0 0 var(--baseline);
 }
 
 a { color: var(--color-accent); text-decoration: none; }
@@ -104,28 +114,29 @@ a:hover { color: var(--color-accent-700); }
   display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   cursor: pointer; text-decoration: none;
   font-family: var(--font-heading); font-weight: 700;
-  font-size: 14px; line-height: 1.2; color: var(--color-text);
+  font-size: var(--text-xs); line-height: 1.2; color: var(--color-text);
   background: transparent; border: 1px solid transparent;
-  padding: var(--space-2) calc(var(--space-3) * 1.2);
+  padding: var(--baseline) calc(var(--baseline) * 2);
   border-radius: var(--radius-md);
 }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-/* Primary CTA — black, matching ivoirelite's "Je veux commander" buttons. */
+/* Primary CTA stays black — neutral, not the accent: the accent is
+   reserved for navigation/selection state, not for every call to action. */
 .btn-primary { background: var(--color-text); color: #fff; }
 .btn-primary:hover { background: var(--color-neutral-800); }
 .btn-primary:active { background: #000; }
 .btn-secondary { border-color: var(--color-divider); }
 .btn-secondary:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
 .btn-secondary:active { background: color-mix(in srgb, var(--color-text) 14%, transparent); }
-.btn-ghost { color: var(--color-accent); padding-inline: var(--space-1); background: transparent; }
+.btn-ghost { color: var(--color-accent); padding-inline: var(--baseline); background: transparent; }
 .btn-ghost:hover { background: var(--color-accent-100); }
 .btn-ghost:active { background: color-mix(in srgb, var(--color-accent) 18%, transparent); }
-.btn-block { width: 100%; margin-top: var(--space-2); }
+.btn-block { width: 100%; margin-top: var(--baseline); }
 
 /* — forms — */
 .input {
-  width: 100%; min-height: 36px; padding: 6px 10px; font: inherit;
-  font-size: 14px; color: var(--color-text); caret-color: var(--color-accent);
+  width: 100%; min-height: 36px; padding: var(--baseline) calc(var(--baseline) * 1.5); font: inherit;
+  font-size: var(--text-xs); color: var(--color-text); caret-color: var(--color-accent);
   background: var(--color-surface);
   border: 1px solid var(--color-divider); border-radius: var(--radius-md);
 }
@@ -133,39 +144,48 @@ a:hover { color: var(--color-accent-700); }
 .input:hover { border-color: color-mix(in srgb, var(--color-text) 45%, transparent); }
 .input:focus-visible { border-color: var(--color-accent); outline-offset: 0; }
 
-/* — tags — */
+/* — tags — one accent discipline: status is read from weight/border/fill,
+   never from a second or third hue. */
 .tag {
-  display: inline-flex; align-items: center; font-size: 11px;
+  display: inline-flex; align-items: center; font-size: var(--text-xs);
   letter-spacing: 0.02em; padding: 3px 10px;
   border-radius: calc(var(--radius-md) * 0.75);
   font-weight: 700;
 }
-.tag-accent { background: var(--color-accent-100); color: var(--color-accent-800); }
-.tag-accent-2 { background: var(--color-accent-2-100); color: var(--color-accent-2-800); }
-/* "neutral" now reads as the theme's success color — every state that used
-   it (Suffisant, Actif, Reçu, Livré, Validé, Réceptionnée) is a completed/
-   good state, matching ivoirelite's green "En stock" convention. */
-.tag-neutral { background: var(--color-success-100); color: var(--color-success-800); }
-.tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent); }
+/* Settled/highlighted positive (ex. Payée): filled black. */
+.tag-accent { background: var(--color-text); color: #fff; }
+/* Needs attention (ex. Impayée, Suspendu, rupture de stock): bordered,
+   uppercase — reads as "look at this" through typography, not color. */
+.tag-accent-2 {
+  background: #fff; color: var(--color-text);
+  border: 1.5px solid var(--color-text);
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+/* Routine / completed (ex. Suffisant, Actif, Reçu, Livré, Validé): quiet gray. */
+.tag-neutral { background: var(--color-neutral-100); color: var(--color-neutral-800); }
+/* Pending / in progress (ex. En attente, Préparé, Dédouanement): outline only. */
+.tag-outline { border: 1px solid var(--color-neutral-400); color: var(--color-neutral-700); }
 
 /* — tables — */
-.table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table { width: 100%; border-collapse: collapse; font-size: var(--text-xs); }
 .table th {
-  text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  text-align: left; font-size: var(--text-xs); letter-spacing: 0.08em; text-transform: uppercase;
   color: color-mix(in srgb, var(--color-text) 60%, transparent);
-  padding: var(--space-2); border-bottom: 1px solid var(--color-divider);
+  padding: var(--baseline); border-bottom: 1px solid var(--color-divider);
 }
 .table td {
-  padding: var(--space-2);
+  padding: var(--baseline);
   border-bottom: 1px solid color-mix(in srgb, var(--color-text) 8%, transparent);
 }
 .table tbody tr:hover { background: color-mix(in srgb, var(--color-text) 4%, transparent); }
 
 .pill {
-  font-family: var(--font-body); font-weight: 700; font-size: 13px; padding: 5px 13px; cursor: pointer;
+  font-family: var(--font-body); font-weight: 700; font-size: var(--text-xs); padding: 5px 13px; cursor: pointer;
   border-radius: var(--radius-md); border: 1px solid var(--color-neutral-300);
   background: transparent; color: var(--color-neutral-800);
 }
+/* Selection state — the accent's other legitimate use: "this is the
+   chosen tab/payment method," same role as nav's active underline. */
 .pill-active {
   border-color: var(--color-accent); background: var(--color-accent); color: #fff;
 }

@@ -36,7 +36,7 @@ export default function Dashboard() {
         ))}
       </div>
 
-      <div className="dash-grid">
+      <div className="dash-grid grid-split-7-5">
         <div>
           <h2 className="section-title">Ventes par dépôt — 30 jours</h2>
           {caParDepot.map((d) => (
