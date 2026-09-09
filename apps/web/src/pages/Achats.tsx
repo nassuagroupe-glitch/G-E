@@ -14,7 +14,7 @@ export default function Achats() {
     <>
       <h1 className="page-title">Achats &amp; fournisseurs</h1>
       <p className="page-subtitle">Commandes en cours et encours fournisseurs</p>
-      <div className="achats-grid">
+      <div className="achats-grid grid-split-6-6">
         <div>
           <h2 className="section-title">Commandes fournisseurs</h2>
           {purchaseOrders.map((c) => (

@@ -58,7 +58,7 @@ export default function Facturation() {
         ))}
       </div>
 
-      <div className="fact-grid">
+      <div className="fact-grid grid-split-7-5">
         <table className="table">
           <thead>
             <tr>

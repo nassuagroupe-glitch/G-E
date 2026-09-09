@@ -33,7 +33,7 @@ export default function Pos() {
         Ticket {ticketNo} · {depot.name} · caissier {staff?.nom}
       </p>
 
-      <div className="pos-grid">
+      <div className="pos-grid grid-split-7-5">
         <div>
           <input
             className="input pos-search"
